@@ -1,6 +1,6 @@
 import { BASE_URL} from "../config/envConfig.js";
 export const registerAPI = async (data) => {
-    const response = await fetch(`${BASE_URL}/register`, {
+    const response = await fetch(`${BASE_URL}/auth/register`, {
         method:"POST",
         headers:{
             "Content-Type":"application/json"
@@ -12,7 +12,7 @@ export const registerAPI = async (data) => {
 };
 
 export const loginAPI = async (data) => {
-    const response = await fetch(`${BASE_URL}/login`, {
+    const response = await fetch(`${BASE_URL}/auth/login`, {
         method:"POST",
         headers:{
             "Content-Type":"application/json"
