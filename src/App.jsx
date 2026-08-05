@@ -3,6 +3,8 @@ import Register from "./pages/Register";
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/protectedRoutes";
 import Home from "./pages/Home";
+import AdminDashboard from "./pages/AdminDashboard";
+import AddProduct from "./pages/AddProducts";
 function App() {
   return (
     <BrowserRouter>
@@ -18,6 +20,8 @@ function App() {
             </ProtectedRoute>
           }
         />
+         <Route path="/admin" element={<AdminDashboard />} />
+         <Route path="/admin/add-product" element={<AddProduct />} />
       </Routes>
     </BrowserRouter>
   );
