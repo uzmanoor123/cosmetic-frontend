@@ -22,3 +22,28 @@ export const loginAPI = async (data) => {
 
     return await response.json();
 };
+export const addProductAPI = async (data) => {
+  const token = localStorage.getItem("token");
+
+  const response = await fetch(`${BASE_URL}/api/products`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  return await response.json();
+};
+export const getProductsAPI = async () => {
+  const token = localStorage.getItem("token");
+
+  const response = await fetch(`${BASE_URL}/api/products`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return await response.json();
+};

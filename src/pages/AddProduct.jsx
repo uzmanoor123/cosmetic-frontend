@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import { addProductAPI } from './../lib/API';
 
 const AddProduct = () => {
   const navigate = useNavigate();
@@ -29,10 +30,35 @@ const AddProduct = () => {
     });
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
 
-    console.log(formData);
+    try {
+      const productData = {
+        ...formData,
+        concerns: formData.concerns
+          .split(",")
+          .map((item) => item.trim()),
+        ingredients: formData.ingredients
+          .split(",")
+          .map((item) => item.trim()),
+
+        benefits: formData.benefits
+          .split(",")
+          .map((item) => item.trim()),
+      };
+      const result = await addProductAPI(productData);
+
+      if (result.success) {
+        alert("Product Added Successfully");
+
+        navigate("/admin");
+      } else {
+        alert(result.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -251,7 +277,6 @@ const AddProduct = () => {
             />
           </div>
 
-          {/* Buttons */}
 
           <div className="flex gap-4">
 

@@ -4,7 +4,7 @@ import Login from "./pages/Login";
 import ProtectedRoute from "./components/protectedRoutes";
 import Home from "./pages/Home";
 import AdminDashboard from "./pages/AdminDashboard";
-import AddProduct from "./pages/AddProducts";
+import AddProduct from "./pages/AddProduct";
 function App() {
   return (
     <BrowserRouter>

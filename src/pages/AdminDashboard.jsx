@@ -1,54 +1,30 @@
 import Navbar from "../components/Navbar";
-import { useState } from "react";
+import { useState , useEffect} from "react";
 import {useNavigate } from "react-router-dom";
-import { 
-  FiPlus, 
-  FiEdit2, 
-  FiTrash2, 
-  FiBox, 
-  FiGrid 
+import { getProductsAPI } from "../lib/API";
+import {  FiPlus, FiEdit2,  FiTrash2,  FiBox,  FiGrid 
 } from "react-icons/fi";
 
-const initialProducts = [
-  {
-    id: 1,
-    title: "Gentle Cleanser",
-    brand: "FreshStart",
-    category: "skincare",
-    price: "$13.99",
-    image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=150",
-  },
-  {
-    id: 2,
-    title: "Peel-Off Mask",
-    brand: "GlowZap",
-    category: "skincare",
-    price: "$14",
-    image: "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=150",
-  },
-  {
-    id: 3,
-    title: "Niacinamide Cream",
-    brand: "BalanceLab",
-    category: "skincare",
-    price: "$22.5",
-    image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=150",
-  },
-  {
-    id: 4,
-    title: "Matte Lipstick",
-    brand: "BeautyPop",
-    category: "makeup",
-    price: "$12.5",
-    image: "https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=150",
-  },
-];
+
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("products");
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const result  = await getProductsAPI();
+      if(result.success){
+        setProducts(result.products);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   return (
+    
     <div className="min-h-screen bg-[#f8f9fa] text-gray-800">
       <Navbar isAdmin={true} />
 
@@ -106,7 +82,7 @@ const AdminDashboard = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 text-sm">
-              {initialProducts.map((product) => (
+              {products.map((product) => (
                 <tr key={product.id} className="hover:bg-gray-50/50 transition-colors">
                   <td className="py-4 px-6">
                     <div className="flex items-center gap-4">
