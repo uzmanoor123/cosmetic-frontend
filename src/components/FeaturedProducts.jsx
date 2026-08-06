@@ -1,13 +1,14 @@
 import { FiHeart } from "react-icons/fi";
 import { FaStar } from "react-icons/fa";
 import { useState, useEffect } from "react";
+import {$BASE_URL} from "../lib/API";
 const FeaturedProducts = () => {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/products");
+        const response = await fetch(`${$BASE_URL}/api/products`);
         const data = await response.json();
         setProducts(data.products);
       } catch (error) {
