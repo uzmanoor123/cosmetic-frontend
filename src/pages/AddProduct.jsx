@@ -1,11 +1,33 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import { addProductAPI } from './../lib/API';
-
+import { addProductAPI, getProductByIdAPI, updateProductAPI } from './../lib/API';
+import { useParams } from "react-router-dom";
 const AddProduct = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
+  useEffect(() => {
+    if (id) {
+      getProduct();
+    }
+  }, [id]);
 
+  const getProduct = async () => {
+    try {
+      const result = await getProductByIdAPI(id);
+
+      if (result.success) {
+        setFormData({
+          ...result.product,
+          concerns: result.product.concerns.join(", "),
+          ingredients: result.product.ingredients.join(", "),
+          benefits: result.product.benefits.join(", "),
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const [formData, setFormData] = useState({
     name: "",
     brand: "",
@@ -47,11 +69,14 @@ const AddProduct = () => {
           .split(",")
           .map((item) => item.trim()),
       };
-      const result = await addProductAPI(productData);
-
+      let result;
+      if (id) {
+        result = await updateProductAPI(id, productData);
+      } else {
+        result = await addProductAPI(productData);
+      }
       if (result.success) {
-        alert("Product Added Successfully");
-
+        alert(id ? "Product Updated Successfully" : "Product Added Successfully");
         navigate("/admin");
       } else {
         alert(result.message);
@@ -72,9 +97,8 @@ const AddProduct = () => {
           className="max-w-xl mx-auto bg-white rounded-2xl shadow border border-gray-200 p-8"
         >
           <h1 className="text-4xl font-bold text-pink-600 mb-10">
-            Add Product
+            {id ? "Edit Product" : "Add Product"}
           </h1>
-
           <div className="mb-5">
             <label className="block mb-2 font-medium text-sm ">Name</label>
 

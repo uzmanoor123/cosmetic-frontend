@@ -2,17 +2,29 @@ import Navbar from "../components/Navbar";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Sparkles } from "lucide-react";
-
+import {registerAPI} from "../lib/API.js";
 const Register = () => {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Registering user:", { fullName, email, password });
-    navigate("/login");
+    try {
+      const result = await registerAPI({
+        name: fullName,
+        email,
+        password
+      });
+      if (result.success) {
+        navigate("/login");
+      } else {
+        alert(result.message);
+      }
+    } catch (error) {
+      console.error("Error registering user:", error);
+    }
   };
 
   return (

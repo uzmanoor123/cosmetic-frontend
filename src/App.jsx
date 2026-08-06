@@ -5,6 +5,7 @@ import ProtectedRoute from "./components/protectedRoutes";
 import Home from "./pages/Home";
 import AdminDashboard from "./pages/AdminDashboard";
 import AddProduct from "./pages/AddProduct";
+
 function App() {
   return (
     <BrowserRouter>
@@ -22,6 +23,7 @@ function App() {
         />
          <Route path="/admin" element={<AdminDashboard />} />
          <Route path="/admin/add-product" element={<AddProduct />} />
+         <Route path="/admin/edit-product/:id" element={<AddProduct />} />
       </Routes>
     </BrowserRouter>
   );

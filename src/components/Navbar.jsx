@@ -3,9 +3,16 @@ import { RiRobot2Line } from "react-icons/ri";
 import { MdHistory } from "react-icons/md";
 import { PiUserPlusLight } from "react-icons/pi";
 import { IoCheckmarkCircle } from "react-icons/io5";
-
+import { useNavigate } from "react-router-dom";
 const Navbar = ({ isAdmin = false }) => {
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    navigate("/login");
+  }
   return (
+
     <nav className="bg-white shadow-sm px-10 py-4 flex items-center justify-between">
       <div className="flex items-center gap-2">
         <div className="w-9 h-9 rounded-full bg-pink-600 flex items-center justify-center text-white font-bold">
@@ -29,7 +36,9 @@ const Navbar = ({ isAdmin = false }) => {
           </svg>
         </div>
 
-        <h1 className="text-2xl font-bold text-pink-600">BeautyBloom</h1>
+        <h1 className="text-2xl font-bold text-pink-600 cursor-pointer" onClick={() => navigate("/homeQ")}>
+          BeautyBloom
+        </h1>
       </div>
 
       <div className="relative w-[420px]">
@@ -66,7 +75,7 @@ const Navbar = ({ isAdmin = false }) => {
               className="cursor-pointer hover:text-pink-600 transition"
               title="Shopping History"
             />
-            <FiLogOut
+            <FiLogOut onClick={handleLogout}
               className="cursor-pointer hover:text-pink-600 transition"
               title="Logout"
             />

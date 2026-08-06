@@ -1,11 +1,9 @@
 import Navbar from "../components/Navbar";
 import { useState , useEffect} from "react";
 import {useNavigate } from "react-router-dom";
-import { getProductsAPI } from "../lib/API";
+import { getProductsAPI, deleteProductAPI } from "../lib/API";
 import {  FiPlus, FiEdit2,  FiTrash2,  FiBox,  FiGrid 
 } from "react-icons/fi";
-
-
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -22,7 +20,26 @@ const AdminDashboard = () => {
 
     fetchProducts();
   }, []);
-
+  const handleEdit = (productId) => {
+    navigate(`/admin/edit-product/${productId}`);
+  };
+  const handleDelete = async (id) => {
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete this product?"
+  );
+  if (!confirmDelete) return;
+  try {
+    const result = await deleteProductAPI(id);
+    if (result.success) {
+      alert("Product deleted successfully");
+      setProducts(products.filter((product) => product._id !== id));
+    } else {
+      alert(result.message);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
   return (
     
     <div className="min-h-screen bg-[#f8f9fa] text-gray-800">
@@ -83,7 +100,7 @@ const AdminDashboard = () => {
             </thead>
             <tbody className="divide-y divide-gray-100 text-sm">
               {products.map((product) => (
-                <tr key={product.id} className="hover:bg-gray-50/50 transition-colors">
+                <tr key={product._id} className="hover:bg-gray-50/50 transition-colors">
                   <td className="py-4 px-6">
                     <div className="flex items-center gap-4">
                       <img
@@ -96,7 +113,7 @@ const AdminDashboard = () => {
                           {product.title}
                         </p>
                         <p className="text-xs text-gray-400 font-medium mt-0.5">
-                          ID: {product.id}
+                          ID: {product._id}
                         </p>
                       </div>
                     </div>
@@ -116,10 +133,12 @@ const AdminDashboard = () => {
                   </td>
                   <td className="py-4 px-6 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <button className="flex items-center gap-1.5 text-xs text-gray-700 font-medium px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 transition">
+                      <button onClick={()=> handleEdit(product._id)}
+                      className="flex items-center gap-1.5 text-xs text-gray-700 font-medium px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 transition">
                         <FiEdit2 className="text-xs" /> Edit
                       </button>
-                      <button className="flex items-center gap-1.5 text-xs text-red-500 font-medium px-3 py-1.5 rounded-lg border border-red-200 hover:bg-red-50 transition">
+                      <button onClick={()=> handleDelete(product._id)}
+                      className="flex items-center gap-1.5 text-xs text-red-500 font-medium px-3 py-1.5 rounded-lg border border-red-200 hover:bg-red-50 transition">
                         <FiTrash2 className="text-xs" /> Delete
                       </button>
                     </div>
