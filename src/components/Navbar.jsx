@@ -4,15 +4,32 @@ import { MdHistory } from "react-icons/md";
 import { PiUserPlusLight } from "react-icons/pi";
 import { IoCheckmarkCircle } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 const Navbar = ({ isAdmin = false }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [search, setSearch] = useState("");
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const searchValue = params.get("search");
+    setSearch(searchValue || "");
+  }, [location.search]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (search.trim()) {
+      navigate(`/products?search=${encodeURIComponent(search)}`);
+    } else {
+      navigate("/products");
+    }
+  };
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
     navigate("/login");
-  }
+  };
   return (
-
     <nav className="bg-white shadow-sm px-10 py-4 flex items-center justify-between">
       <div className="flex items-center gap-2">
         <div className="w-9 h-9 rounded-full bg-pink-600 flex items-center justify-center text-white font-bold">
@@ -36,20 +53,27 @@ const Navbar = ({ isAdmin = false }) => {
           </svg>
         </div>
 
-        <h1 className="text-2xl font-bold text-pink-600 cursor-pointer" onClick={() => navigate("/homeQ")}>
+        <h1
+          className="text-2xl font-bold text-pink-600 cursor-pointer"
+          onClick={() => navigate("/home")}
+        >
           BeautyBloom
         </h1>
       </div>
-
-      <div className="relative w-[420px]">
-        <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+      <form onSubmit={handleSearch} className="relative w-[420px]">
+        <FiSearch
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer"
+          onClick={handleSearch}
+        />
 
         <input
           type="text"
           placeholder="Search products, brands..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
           className="w-full border border-gray-200 py-2 pl-10 pr-4 rounded-md outline-none focus:border-pink-500"
         />
-      </div>
+      </form>
 
       <div className="flex items-center gap-6 text-[22px]">
         {isAdmin ? (
@@ -75,7 +99,8 @@ const Navbar = ({ isAdmin = false }) => {
               className="cursor-pointer hover:text-pink-600 transition"
               title="Shopping History"
             />
-            <FiLogOut onClick={handleLogout}
+            <FiLogOut
+              onClick={handleLogout}
               className="cursor-pointer hover:text-pink-600 transition"
               title="Logout"
             />

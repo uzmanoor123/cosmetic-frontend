@@ -2,9 +2,10 @@ import { FiHeart } from "react-icons/fi";
 import { FaStar } from "react-icons/fa";
 import { useState, useEffect } from "react";
 import {BASE_URL} from "../config/envConfig";
+import {useNavigate} from "react-router-dom";
 const FeaturedProducts = () => {
   const [products, setProducts] = useState([]);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -32,7 +33,7 @@ const FeaturedProducts = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-        {products.map((product) => (
+        {products.slice(0, 10).map((product) => (
           <div
             key={product._id}
             className="bg-white rounded-2xl p-3 shadow-sm border border-gray-100 hover:shadow-xl  transition-all duration-300 group cursor-pointer"
@@ -88,7 +89,8 @@ const FeaturedProducts = () => {
       </div>
 
       <div className="text-center mt-12">
-        <button className="bg-[#ec008c] hover:bg-[#c90077] text-white font-semibold px-8 py-3 rounded-full transition-colors duration-200 shadow-md">
+        <button onClick={() => navigate("/products")}
+        className="bg-[#ec008c] hover:bg-[#c90077] text-white font-semibold px-8 py-3 rounded-full transition-colors duration-200 shadow-md">
           See All Products
         </button>
       </div>
