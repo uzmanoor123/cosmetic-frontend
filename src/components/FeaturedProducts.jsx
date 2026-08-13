@@ -1,8 +1,9 @@
 import { FiHeart } from "react-icons/fi";
 import { FaStar } from "react-icons/fa";
 import { useState, useEffect } from "react";
-import {BASE_URL} from "../config/envConfig";
-import {useNavigate} from "react-router-dom";
+import { BASE_URL } from "../config/envConfig";
+import { useNavigate } from "react-router-dom";
+import { addToCartAPI } from "../lib/API";
 const FeaturedProducts = () => {
   const [products, setProducts] = useState([]);
   const navigate = useNavigate();
@@ -19,6 +20,22 @@ const FeaturedProducts = () => {
 
     fetchProducts();
   }, []);
+  const handleAddToCart = async (productId) => {
+    try {
+      const result = await addToCartAPI(productId);
+
+      if (result.success) {
+        alert("Product added to cart");
+
+        window.dispatchEvent(new Event("cartUpdated"));
+      } else {
+        alert(result.message);
+      }
+    } catch (error) {
+      console.log(error);
+      alert("Something went wrong");
+    }
+  };
 
   return (
     <section className="mx-auto px-5 py-10">
@@ -80,7 +97,8 @@ const FeaturedProducts = () => {
                 ${product.price}
               </p>
 
-              <button className="w-full bg-[#ec008c] hover:bg-[#c90077] text-white font-semibold py-2.5 rounded-xl transition-colors duration-200 text-sm shadow-sm">
+              <button onClick={() => handleAddToCart(product._id)}
+                className="w-full bg-[#ec008c] hover:bg-[#c90077] text-white font-semibold py-2.5 rounded-xl transition-colors duration-200 text-sm shadow-sm">
                 Add to Cart
               </button>
             </div>
@@ -90,7 +108,7 @@ const FeaturedProducts = () => {
 
       <div className="text-center mt-12">
         <button onClick={() => navigate("/products")}
-        className="bg-[#ec008c] hover:bg-[#c90077] text-white font-semibold px-8 py-3 rounded-full transition-colors duration-200 shadow-md">
+          className="bg-[#ec008c] hover:bg-[#c90077] text-white font-semibold px-8 py-3 rounded-full transition-colors duration-200 shadow-md">
           See All Products
         </button>
       </div>

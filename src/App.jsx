@@ -6,7 +6,7 @@ import Home from "./pages/Home";
 import AdminDashboard from "./pages/AdminDashboard";
 import AddProduct from "./pages/AddProduct";
 import Products from "./pages/Products";
-
+import Cart from "./pages/Cart";
 function App() {
   return (
     <BrowserRouter>
@@ -26,6 +26,7 @@ function App() {
          <Route path="/admin/add-product" element={<AddProduct />} />
          <Route path="/admin/edit-product/:id" element={<AddProduct />} />
           <Route path="/products" element={<Products />} />
+          <Route path="/cart" element={<Cart />} />
       </Routes>
     </BrowserRouter>
   );
