@@ -7,6 +7,8 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AddProduct from "./pages/AddProduct";
 import Products from "./pages/Products";
 import Cart from "./pages/Cart";
+import ProductDetails from "./pages/ProductDetails";
+
 function App() {
   return (
     <BrowserRouter>
@@ -14,19 +16,64 @@ function App() {
         <Route path="/" element={<Navigate to="/register" />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+
         <Route
           path="/home"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["user", "admin"]}>
               <Home />
             </ProtectedRoute>
           }
         />
-         <Route path="/admin" element={<AdminDashboard />} />
-         <Route path="/admin/add-product" element={<AddProduct />} />
-         <Route path="/admin/edit-product/:id" element={<AddProduct />} />
-          <Route path="/products" element={<Products />} />
-          <Route path="/cart" element={<Cart />} />
+        <Route
+          path="/products"
+          element={
+            <ProtectedRoute allowedRoles={["user", "admin"]}>
+              <Products />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/cart"
+          element={
+            <ProtectedRoute allowedRoles={["user", "admin"]}>
+              <Cart />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/product/:id"
+          element={
+            <ProtectedRoute allowedRoles={["user", "admin"]}>
+              <ProductDetails />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/add-product"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AddProduct />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/edit-product/:id"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AddProduct />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../config/envConfig";
 import Navbar from "../components/Navbar";
 import { useSearchParams } from "react-router-dom";
+import { addToCartAPI } from "../lib/API";
+
 const Products = () => {
   const navigate = useNavigate();
   const searchParams = useSearchParams();
@@ -77,6 +79,22 @@ const Products = () => {
   if (sortBy === "Name: A-Z") {
     filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
   }
+    const handleAddToCart = async (productId) => {
+    try {
+      const result = await addToCartAPI(productId);
+
+      if (result.success) {
+        alert("Product added to cart");
+
+        window.dispatchEvent(new Event("cartUpdated"));
+      } else {
+        alert(result.message);
+      }
+    } catch (error) {
+      console.log(error);
+      alert("Something went wrong");
+    }
+  };
 
   return (
     <>
@@ -233,13 +251,13 @@ const Products = () => {
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 ">
                 {filteredProducts.map((product) => (
                   <div
                     key={product._id}
                     className="bg-white rounded-xl p-3 border border-gray-200 shadow-sm hover:shadow-lg transition"
                   >
-                    <div className="relative h-48 bg-gray-50 rounded-lg overflow-hidden mb-4">
+                    <div className="relative h-48 bg-gray-50 rounded-lg overflow-hidden mb-4 group">
                       {product.badge && (
                         <span
                           className={`absolute top-2 left-2 px-2 py-1 rounded-full text-white text-[10px] font-semibold z-10 ${
@@ -259,16 +277,19 @@ const Products = () => {
                       <button className="absolute top-2 right-2 w-8 h-8 bg-white rounded-lg flex items-center justify-center z-10 shadow-sm">
                         <FiHeart className="text-gray-600 text-sm" />
                       </button>
-                      <img
+                      <img 
+                      onClick={() => navigate(`/product/${product._id}`)}
                         src={product.image}
                         alt={product.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover hover:cursor-pointer group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>
                     <p className="text-xs text-gray-400 mb-1">
                       {product.brand}
                     </p>
-                    <h3 className="font-semibold text-gray-800 text-sm mb-2">
+                    <h3 className="font-semibold text-gray-800 text-sm mb-2 hover:cursor-pointer hover:text-pink-600"
+                    onClick={() => navigate(`/product/${product._id}`)}>
+                      
                       {product.name}
                     </h3>
                     <div className="flex items-center gap-1 mb-2">
@@ -278,7 +299,8 @@ const Products = () => {
                     <p className="font-bold text-gray-900 mb-3">
                       ${product.price}
                     </p>
-                    <button className="w-full bg-pink-600 hover:bg-pink-700 text-white py-2 rounded-lg text-xs font-semibold">
+                    <button onClick={() => handleAddToCart(product._id)}
+                    className="w-full bg-pink-600 hover:bg-pink-700 text-white py-2 rounded-lg text-xs font-semibold hover:cursor-pointer">
                       Add to Cart
                     </button>
                   </div>

@@ -74,7 +74,7 @@ const FeaturedProducts = () => {
                 <FiHeart className="text-sm" />
               </button>
 
-              <img
+              <img onClick={() => navigate(`/product/${product._id}`)}
                 src={product.image}
                 alt={product.name}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
@@ -84,7 +84,9 @@ const FeaturedProducts = () => {
               <p className="text-xs font-medium text-gray-400 mb-1">
                 {product.brand}
               </p>
-              <h3 className="font-semibold text-gray-800 text-base mb-1.5 line-clamp-1">
+              <h3 
+              onClick={() => navigate(`/product/${product._id}`)}
+              className="font-semibold text-gray-800 text-base mb-1.5 line-clamp-1">
                 {product.name}
               </h3>
 

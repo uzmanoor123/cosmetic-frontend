@@ -129,7 +129,7 @@ const AdminDashboard = () => {
                     </div>
                   </td>
                   <td className="py-4 px-6 font-bold text-gray-900 text-sm">
-                    {product.price}
+                    ${product.price}
                   </td>
                   <td className="py-4 px-6 text-right">
                     <div className="flex items-center justify-end gap-2">
