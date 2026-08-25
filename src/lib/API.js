@@ -177,3 +177,28 @@ export const removeCartItemAPI = async (productId) => {
 
   return await response.json();
 };
+export const createCheckoutSessionAPI = async () => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(
+      `${BASE_URL}/api/payment/create-checkout-session`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    return await response.json();
+  } catch (error) {
+    console.log("Checkout API error:", error);
+
+    return {
+      success: false,
+      message: "Something went wrong",
+    };
+  }
+};

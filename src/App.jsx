@@ -8,6 +8,7 @@ import AddProduct from "./pages/AddProduct";
 import Products from "./pages/Products";
 import Cart from "./pages/Cart";
 import ProductDetails from "./pages/ProductDetails";
+import PaymentSuccess from "./pages/PaymentSuccess";
 
 function App() {
   return (
@@ -73,6 +74,10 @@ function App() {
               <AddProduct />
             </ProtectedRoute>
           }
+        />
+        <Route
+          path="/payment-success"
+          element={<PaymentSuccess />}
         />
       </Routes>
     </BrowserRouter>

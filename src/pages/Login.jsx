@@ -20,8 +20,8 @@ const Login = () => {
       if (result.success) {
 
         localStorage.setItem("token", result.token);
-
         localStorage.setItem("role", result.user.role);
+        window.dispatchEvent(new Event("authUpdated"));
 
         if (result.user.role === "admin") {
           navigate("/admin");

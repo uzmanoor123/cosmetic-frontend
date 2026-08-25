@@ -1,19 +1,8 @@
 import { useEffect, useState } from "react";
-import {
-  FiMinus,
-  FiPlus,
-  FiTrash2,
-  FiArrowLeft,
-} from "react-icons/fi";
+import { FiMinus, FiPlus, FiTrash2,  FiArrowLeft,} from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
-
-import {
-  getCartAPI,
-  increaseCartAPI,
-  decreaseCartAPI,
-  removeCartItemAPI,
-} from "../lib/API";
+import {getCartAPI,increaseCartAPI,decreaseCartAPI,removeCartItemAPI, createCheckoutSessionAPI} from "../lib/API";
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -95,6 +84,27 @@ const Cart = () => {
       console.log("Remove cart error:", error);
     }
   };
+const handleCheckout = async () => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    navigate("/login");
+    return;
+  }
+
+  try {
+    const result = await createCheckoutSessionAPI();
+
+    if (result.success && result.url) {
+      window.location.href = result.url;
+    } else {
+      alert(result.message || "Unable to proceed to checkout");
+    }
+  } catch (error) {
+    console.log("Checkout error:", error);
+    alert("Something went wrong");
+  }
+};
 
   if (loading) {
     return (
@@ -277,6 +287,7 @@ const Cart = () => {
                 </div>
 
                 <button
+                 onClick={handleCheckout}
                   className="w-full mt-6 bg-[#ec008c] hover:bg-[#c90077] text-white py-3 rounded-xl font-semibold transition"
                 >
                   Checkout
