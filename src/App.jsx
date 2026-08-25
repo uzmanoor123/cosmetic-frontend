@@ -9,7 +9,7 @@ import Products from "./pages/Products";
 import Cart from "./pages/Cart";
 import ProductDetails from "./pages/ProductDetails";
 import PaymentSuccess from "./pages/PaymentSuccess";
-
+import ShoppingHistory from "./pages/ShoppingHistory";
 function App() {
   return (
     <BrowserRouter>
@@ -78,6 +78,14 @@ function App() {
         <Route
           path="/payment-success"
           element={<PaymentSuccess />}
+        />
+        <Route
+          path="/history"
+          element={
+            <ProtectedRoute allowedRoles={["user", "admin"]}>
+              <ShoppingHistory />
+            </ProtectedRoute>
+          }
         />
       </Routes>
     </BrowserRouter>
