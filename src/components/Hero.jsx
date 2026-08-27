@@ -1,5 +1,7 @@
 import { RiRobot2Line } from "react-icons/ri";
+import { useNavigate} from "react-router-dom"
 const Hero = () => {
+    const navigate = useNavigate();
     return (
         <section className="bg-[#ffd2e6]">
             <div className=" mx-auto px-3 py-10">
@@ -22,11 +24,15 @@ const Hero = () => {
 
                         <div className="flex gap-5 mt-10">
 
-                            <button className="bg-[#ec008c] text-white px-12  rounded-xl font-semibold">
+                            <button 
+                            onClick={() => navigate("/products")}
+                            className="bg-[#ec008c] text-white px-12  rounded-xl font-semibold">
                                 Shop Now
                             </button>
 
-                            <button className="border border-pink-400 text-pink-600 px-5 py-2 rounded-xl flex items-center gap-3 font-semibold hover:bg-white hover:text-black">
+                            <button 
+                            onClick={() => navigate("/ai-consultant")}
+                            className="border border-pink-400 text-pink-600 px-5 py-2 rounded-xl flex items-center gap-3 font-semibold hover:bg-white hover:text-black">
                                 <RiRobot2Line />
                                 Get AI Recommendations
                             </button>

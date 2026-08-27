@@ -1,5 +1,7 @@
 import { RiRobot2Line } from "react-icons/ri";
+import { useNavigate} from "react-router-dom"
 const AiBanner = () => {
+  const navigate = useNavigate();
   return (
     <div className=" mx-auto px-5 my-10">
       <div className="bg-pink-600 text-white rounded-2xl p-8 text-center flex flex-col items-center shadow-lg">
@@ -12,7 +14,9 @@ const AiBanner = () => {
         <p className="text-pink-100 max-w-2xl text-lg mb-6">
           Our AI Beauty Consultant analyzes your skin type, concerns, and preferences to recommend the perfect products just for you.
         </p>
-        <button className="bg-white text-[#ec008c] font-semibold px-8 py-3 rounded-md hover:bg-pink-50 transition shadow-md flex items-center gap-2">
+        <button 
+        onClick={() => navigate("/ai-consultant")}
+        className="bg-white text-[#ec008c] font-semibold px-8 py-3 rounded-md hover:bg-pink-50 transition shadow-md flex items-center gap-2">
           <RiRobot2Line className="text-xl" /> Try AI Recommendation
         </button>
       </div>

@@ -202,3 +202,30 @@ export const createCheckoutSessionAPI = async () => {
     };
   }
 };
+export const getMyOrdersAPI = async () => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(`${BASE_URL}/api/orders/my-orders`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log("Orders response status:", response.status);
+
+    const data = await response.json();
+
+    console.log("Orders API response:", data);
+
+    return data;
+  } catch (error) {
+    console.log("Orders error:", error);
+
+    return {
+      success: false,
+      message: "Unable to fetch orders",
+    };
+  }
+};
