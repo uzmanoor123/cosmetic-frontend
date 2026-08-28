@@ -1,12 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  FiArrowLeft,
-  FiMinus,
-  FiPlus,
-  FiHeart,
-  FiShoppingCart,
-} from "react-icons/fi";
+import { FiArrowLeft, FiMinus, FiPlus, FiHeart, FiShoppingCart, } from "react-icons/fi";
 import { FaStar } from "react-icons/fa";
 
 import Navbar from "../components/Navbar";
@@ -89,8 +83,6 @@ const ProductDetail = () => {
       }
 
       window.dispatchEvent(new Event("cartUpdated"));
-
-      alert("Product added to cart");
     } catch (error) {
       console.log("Add to cart error:", error);
       alert("Something went wrong");
@@ -105,7 +97,6 @@ const ProductDetail = () => {
 
       if (result.success) {
         window.dispatchEvent(new Event("cartUpdated"));
-        alert("Product added to cart");
       } else {
         alert(result.message);
       }
@@ -168,15 +159,14 @@ const ProductDetail = () => {
                 <div className="relative w-full h-[400px] bg-gray-50 rounded-2xl overflow-hidden flex items-center justify-center">
                   {product.badge && (
                     <span
-                      className={`absolute top-4 left-4 px-3 py-1 rounded-full text-white text-xs font-semibold z-10 ${
-                        product.badgeColor === "Pink"
+                      className={`absolute top-4 left-4 px-3 py-1 rounded-full text-white text-xs font-semibold z-10 ${product.badgeColor === "Pink"
                           ? "bg-pink-500"
                           : product.badgeColor === "Green"
                             ? "bg-green-500"
                             : product.badgeColor === "Blue"
                               ? "bg-blue-500"
                               : "bg-orange-500"
-                      }`}
+                        }`}
                     >
                       {product.badge}
                     </span>
@@ -271,8 +261,8 @@ const ProductDetail = () => {
                     {adding
                       ? "Adding..."
                       : `Add to Cart - $${(product.price * quantity).toFixed(
-                          2,
-                        )}`}
+                        2,
+                      )}`}
                   </button>
 
                   <button className="w-12 h-12 border border-pink-500 text-pink-500 rounded-xl flex items-center justify-center hover:bg-pink-50 transition">

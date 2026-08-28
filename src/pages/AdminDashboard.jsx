@@ -143,7 +143,8 @@ const AdminDashboard = () => {
   const totalRevenue = transactions
     .filter((order) => order.paymentStatus === "paid")
     .reduce(
-      (total, order) => total + Number(order.totalAmount || 0),
+      (total, order) =>
+        total + Number(order.totalAmount || 0),
       0
     );
 
@@ -503,6 +504,10 @@ const AdminDashboard = () => {
                       <th className="py-5 px-5">
                         DATE
                       </th>
+
+                      <th className="py-5 px-5 text-right">
+                        ACTIONS
+                      </th>
                     </tr>
                   </thead>
 
@@ -517,20 +522,11 @@ const AdminDashboard = () => {
                             #{order._id.slice(-6)}
                           </p>
 
-                          {order.paymentStatus === "refunded" ? (
-                            <p className="text-xs text-gray-500 mt-2">
+                          {order.paymentStatus === "refunded" && (
+                            <p className="text-xs text-gray-500 mt-2 break-all">
                               Refund: {order.refundId || "N/A"}
                             </p>
-                          ) : order.paymentStatus === "paid" ? (
-                            <button
-                              onClick={() =>
-                                handleRefund(order._id)
-                              }
-                              className="text-xs text-red-500 hover:text-red-700 font-medium mt-2"
-                            >
-                              Refund
-                            </button>
-                          ) : null}
+                          )}
                         </td>
 
                         <td className="py-5 px-5">
@@ -553,28 +549,31 @@ const AdminDashboard = () => {
 
                         <td className="py-5 px-5">
                           <div className="space-y-3">
-                            {order.items?.map((item, index) => (
-                              <div
-                                key={index}
-                                className="flex items-center gap-3"
-                              >
-                                <img
-                                  src={item.image}
-                                  alt={item.name}
-                                  className="w-10 h-10 rounded-lg object-cover bg-gray-100"
-                                />
+                            {order.items?.map(
+                              (item, index) => (
+                                <div
+                                  key={index}
+                                  className="flex items-center gap-3"
+                                >
+                                  <img
+                                    src={item.image}
+                                    alt={item.name}
+                                    className="w-10 h-10 rounded-lg object-cover bg-gray-100"
+                                  />
 
-                                <div>
-                                  <p className="text-sm font-semibold text-gray-800">
-                                    {item.name}
-                                  </p>
+                                  <div>
+                                    <p className="text-sm font-semibold text-gray-800">
+                                      {item.name}
+                                    </p>
 
-                                  <p className="text-xs text-gray-400">
-                                    Quantity: {item.quantity}
-                                  </p>
+                                    <p className="text-xs text-gray-400">
+                                      Quantity:{" "}
+                                      {item.quantity}
+                                    </p>
+                                  </div>
                                 </div>
-                              </div>
-                            ))}
+                              )
+                            )}
                           </div>
                         </td>
 
@@ -592,17 +591,20 @@ const AdminDashboard = () => {
                         </td>
 
                         <td className="py-5 px-5">
-                          {order.paymentStatus === "refunded" ? (
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-50 text-red-600 text-xs font-semibold">
+                          {order.paymentStatus ===
+                          "refunded" ? (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 text-blue-600 text-xs font-semibold">
                               <FiRefreshCcw />
                               Refunded
                             </span>
-                          ) : order.paymentStatus === "paid" ? (
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-50 text-green-600 text-xs font-semibold">
+                          ) : order.paymentStatus ===
+                            "paid" ? (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 text-xs font-semibold">
                               <FiCheckCircle />
                               Paid
                             </span>
-                          ) : order.paymentStatus === "failed" ? (
+                          ) : order.paymentStatus ===
+                            "failed" ? (
                             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-50 text-red-600 text-xs font-semibold">
                               Failed
                             </span>
@@ -632,6 +634,30 @@ const AdminDashboard = () => {
                               </p>
                             </div>
                           </div>
+                        </td>
+
+                        <td className="py-5 px-5 text-right">
+                          {order.paymentStatus ===
+                          "paid" ? (
+                            <button
+                              onClick={() =>
+                                handleRefund(order._id)
+                              }
+                              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-red-200 text-red-500 text-xs font-medium hover:bg-red-50 transition"
+                            >
+                              <FiRefreshCcw />
+                              Refund
+                            </button>
+                          ) : order.paymentStatus ===
+                            "refunded" ? (
+                            <span className="text-xs text-gray-400">
+                              Refunded
+                            </span>
+                          ) : (
+                            <span className="text-xs text-gray-300">
+                              —
+                            </span>
+                          )}
                         </td>
                       </tr>
                     ))}

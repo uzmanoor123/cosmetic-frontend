@@ -214,7 +214,9 @@ const AddProduct = () => {
               <option>Skincare</option>
               <option>Hair Care</option>
               <option>Makeup</option>
-              <option>Body Care</option>
+              <option>Wellness</option>
+              <option>Fragrance</option>
+              <option>Men's Care</option>
             </select>
           </div>
 

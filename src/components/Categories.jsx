@@ -7,7 +7,7 @@ const categories = [
     { name: "Fragrance", icon: FaSpa, color: "bg-rose-100 text-rose-600" },
     { name: "Men's Care", icon: FaUser, color: "bg-gray-100 text-gray-700" },
 ];
-const Categories = () => {
+const Categories = ({ selectedCategory, setSelectedCategory }) => {
     return (
         <section className="mx-auto  px-5 py-12 text-center">
             <h2 className="text-3xl font-bold text-gray-800">Shop by Category</h2>
@@ -21,7 +21,11 @@ const Categories = () => {
                     return (
                         <div
                             key={index}
-                            className="bg-white p-15 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer border border-gray-100 flex flex-col items-center"
+                            onClick={() => setSelectedCategory(cat.name)}
+                            className={`bg-white p-15 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer border flex flex-col items-center ${selectedCategory === cat.name
+                                    ? "border-pink-500 shadow-lg"
+                                    : "border-gray-100"
+                                }`}
                         >
                             <div
                                 className={`w-14 h-14 rounded-full flex items-center justify-center mb-4 ${cat.color}`}
