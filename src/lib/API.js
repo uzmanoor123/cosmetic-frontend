@@ -229,3 +229,66 @@ export const getMyOrdersAPI = async () => {
     };
   }
 };
+export const updateOrderStatusAPI = async (orderId, orderStatus) => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(
+      `${BASE_URL}/api/orders/${orderId}/status`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          orderStatus,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    return data;
+  } catch (error) {
+    console.log("Update order status error:", error);
+
+    return {
+      success: false,
+      message: "Unable to update order status",
+    };
+  }
+};
+export const createReviewAPI = async (productId, orderId,rating,comment) => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(
+      `${BASE_URL}/api/reviews`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          productId,
+          orderId,
+          rating,
+          comment,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    return data;
+  } catch (error) {
+    console.log("Create review error:", error);
+
+    return {
+      success: false,
+      message: "Unable to add review",
+    };
+  }
+};

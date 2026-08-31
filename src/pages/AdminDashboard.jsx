@@ -1,7 +1,7 @@
 import Navbar from "../components/Navbar";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getProductsAPI, deleteProductAPI } from "../lib/API";
+import { getProductsAPI, deleteProductAPI, updateOrderStatusAPI, } from "../lib/API";
 import { FiPlus, FiEdit2, FiTrash2, FiBox, FiGrid, FiSearch, FiCreditCard, FiDollarSign, FiCheckCircle, FiRefreshCcw, FiUser, FiCalendar, FiClock, } from "react-icons/fi";
 
 const AdminDashboard = () => {
@@ -14,6 +14,7 @@ const AdminDashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [deleteProduct, setDeleteProduct] = useState(null);
+
   useEffect(() => {
     const fetchProducts = async () => {
       const result = await getProductsAPI();
@@ -126,6 +127,33 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleOrderStatusChange = async (orderId, newStatus) => {
+    try {
+      const result = await updateOrderStatusAPI(
+        orderId,
+        newStatus
+      );
+
+      if (result.success) {
+        setTransactions((prevTransactions) =>
+          prevTransactions.map((order) =>
+            order._id === orderId
+              ? {
+                  ...order,
+                  orderStatus: newStatus,
+                }
+              : order
+          )
+        );
+      } else {
+        alert(result.message);
+      }
+    } catch (error) {
+      console.log("Order status error:", error);
+      alert("Something went wrong");
+    }
+  };
+
   const totalTransactions = transactions.length;
 
   const totalRevenue = transactions
@@ -193,10 +221,11 @@ const AdminDashboard = () => {
           <div className="bg-gray-100/80 p-1.5 rounded-xl border border-gray-200/60 flex items-center gap-1">
             <button
               onClick={() => setActiveTab("products")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition ${activeTab === "products"
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition ${
+                activeTab === "products"
                   ? "bg-[#ec008c] text-white shadow-sm"
                   : "text-gray-600 hover:text-gray-900"
-                }`}
+              }`}
             >
               <FiBox className="text-sm" />
               Products
@@ -204,10 +233,11 @@ const AdminDashboard = () => {
 
             <button
               onClick={() => setActiveTab("transactions")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition ${activeTab === "transactions"
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition ${
+                activeTab === "transactions"
                   ? "bg-[#ec008c] text-white shadow-sm"
                   : "text-gray-600 hover:text-gray-900"
-                }`}
+              }`}
             >
               <FiGrid className="text-sm" />
               Transactions
@@ -484,7 +514,11 @@ const AdminDashboard = () => {
                       </th>
 
                       <th className="py-5 px-5">
-                        STATUS
+                        PAYMENT STATUS
+                      </th>
+
+                      <th className="py-5 px-5">
+                        ORDER STATUS
                       </th>
 
                       <th className="py-5 px-5">
@@ -510,7 +544,8 @@ const AdminDashboard = () => {
 
                           {order.paymentStatus === "refunded" && (
                             <p className="text-xs text-gray-500 mt-2 break-all">
-                              Refund: {order.refundId || "N/A"}
+                              Refund:{" "}
+                              {order.refundId || "N/A"}
                             </p>
                           )}
                         </td>
@@ -527,7 +562,8 @@ const AdminDashboard = () => {
                               </p>
 
                               <p className="text-xs text-gray-400">
-                                {order.user?.email || "No email"}
+                                {order.user?.email ||
+                                  "No email"}
                               </p>
                             </div>
                           </div>
@@ -578,7 +614,7 @@ const AdminDashboard = () => {
 
                         <td className="py-5 px-5">
                           {order.paymentStatus ===
-                            "refunded" ? (
+                          "refunded" ? (
                             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 text-blue-600 text-xs font-semibold">
                               <FiRefreshCcw />
                               Refunded
@@ -603,6 +639,38 @@ const AdminDashboard = () => {
                         </td>
 
                         <td className="py-5 px-5">
+                          <select
+                            value={
+                              order.orderStatus ||
+                              "processing"
+                            }
+                            onChange={(e) =>
+                              handleOrderStatusChange(
+                                order._id,
+                                e.target.value
+                              )
+                            }
+                            className="border border-gray-200 rounded-lg px-3 py-2 text-xs font-semibold text-gray-700 outline-none focus:border-pink-400"
+                          >
+                            <option value="processing">
+                              Processing
+                            </option>
+
+                            <option value="shipped">
+                              Shipped
+                            </option>
+
+                            <option value="delivered">
+                              Delivered
+                            </option>
+
+                            <option value="cancelled">
+                              Cancelled
+                            </option>
+                          </select>
+                        </td>
+
+                        <td className="py-5 px-5">
                           <div className="flex items-start gap-2">
                             <FiCalendar className="text-gray-400 mt-0.5" />
 
@@ -623,8 +691,7 @@ const AdminDashboard = () => {
                         </td>
 
                         <td className="py-5 px-5 text-right">
-                          {order.paymentStatus ===
-                            "paid" ? (
+                          {order.paymentStatus === "paid" ? (
                             <button
                               onClick={() =>
                                 handleRefund(order._id)
@@ -654,13 +721,11 @@ const AdminDashboard = () => {
           </div>
         </main>
       )}
+
       {deleteProduct && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[100] px-4">
-
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
-
             <div className="flex items-center justify-between mb-5">
-
               <h2 className="text-xl font-bold text-gray-800">
                 Delete Product
               </h2>
@@ -671,11 +736,9 @@ const AdminDashboard = () => {
               >
                 <span className="text-xl">×</span>
               </button>
-
             </div>
 
             <div className="mb-6">
-
               <p className="text-gray-600">
                 Are you sure you want to delete this product?
               </p>
@@ -683,11 +746,9 @@ const AdminDashboard = () => {
               <p className="font-semibold text-gray-800 mt-3">
                 {deleteProduct.name}
               </p>
-
             </div>
 
             <div className="flex justify-end gap-3">
-
               <button
                 onClick={() => setDeleteProduct(null)}
                 className="px-5 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-100 transition"
@@ -701,11 +762,8 @@ const AdminDashboard = () => {
               >
                 Delete
               </button>
-
             </div>
-
           </div>
-
         </div>
       )}
     </div>

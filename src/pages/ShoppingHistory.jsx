@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
-import { getMyOrdersAPI } from "../lib/API";
+import { getMyOrdersAPI, createReviewAPI } from "../lib/API";
 
 const ShoppingHistory = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [reviewProduct, setReviewProduct] = useState(null);
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState("");
 
   useEffect(() => {
-     console.log("SHOPPING HISTORY LOADED");
     const fetchOrders = async () => {
       try {
         const result = await getMyOrdersAPI();
@@ -27,6 +29,35 @@ const ShoppingHistory = () => {
 
     fetchOrders();
   }, []);
+
+  const handleReviewSubmit = async () => {
+    if (!comment.trim()) {
+      alert("Please write a review");
+      return;
+    }
+
+    try {
+      const result = await createReviewAPI(
+        reviewProduct.productId,
+        reviewProduct.orderId,
+        rating,
+        comment
+      );
+
+      if (result.success) {
+        alert("Review added successfully");
+
+        setReviewProduct(null);
+        setRating(5);
+        setComment("");
+      } else {
+        alert(result.message);
+      }
+    } catch (error) {
+      console.log("Review error:", error);
+      alert("Something went wrong");
+    }
+  };
 
   return (
     <>
@@ -83,7 +114,7 @@ const ShoppingHistory = () => {
                       </span>
 
                       <span className="px-3 py-1 rounded-full bg-pink-50 text-pink-600 text-sm font-semibold capitalize">
-                        {order.orderStatus}
+                        Order: {order.orderStatus}
                       </span>
                     </div>
                   </div>
@@ -92,7 +123,7 @@ const ShoppingHistory = () => {
                     {order.items.map((item, index) => (
                       <div
                         key={index}
-                        className="flex items-center gap-4 border-b border-gray-100 pb-4"
+                        className="flex flex-col md:flex-row md:items-center gap-4 border-b border-gray-100 pb-4"
                       >
                         <img
                           src={item.image}
@@ -110,13 +141,28 @@ const ShoppingHistory = () => {
                           </p>
 
                           <p className="text-sm text-gray-500 mt-1">
-                            Price: ${item.price.toFixed(2)}
+                            Price: ${Number(item.price).toFixed(2)}
                           </p>
                         </div>
 
                         <p className="font-semibold text-gray-800">
                           ${(item.price * item.quantity).toFixed(2)}
                         </p>
+
+                        {order.orderStatus === "delivered" && (
+                          <button
+                            onClick={() =>
+                              setReviewProduct({
+                                productId:
+                                  item.product?._id || item.product,
+                                orderId: order._id,
+                              })
+                            }
+                            className="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-lg text-sm font-semibold"
+                          >
+                            Leave Review
+                          </button>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -127,7 +173,7 @@ const ShoppingHistory = () => {
                     </span>
 
                     <span className="font-bold text-pink-600 text-lg">
-                      ${order.totalAmount.toFixed(2)}
+                      ${Number(order.totalAmount).toFixed(2)}
                     </span>
                   </div>
                 </div>
@@ -136,6 +182,68 @@ const ShoppingHistory = () => {
           )}
         </div>
       </div>
+
+      {reviewProduct && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+            <h2 className="text-xl font-bold text-gray-800 mb-5">
+              Leave a Review
+            </h2>
+
+            <div className="mb-5">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Rating
+              </label>
+
+              <select
+                value={rating}
+                onChange={(e) => setRating(Number(e.target.value))}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 outline-none"
+              >
+                <option value={5}>5 - Excellent</option>
+                <option value={4}>4 - Good</option>
+                <option value={3}>3 - Average</option>
+                <option value={2}>2 - Poor</option>
+                <option value={1}>1 - Very Poor</option>
+              </select>
+            </div>
+
+            <div className="mb-5">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Your Review
+              </label>
+
+              <textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Write your review..."
+                rows="4"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 outline-none resize-none"
+              />
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  setReviewProduct(null);
+                  setRating(5);
+                  setComment("");
+                }}
+                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleReviewSubmit}
+                className="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-lg font-semibold"
+              >
+                Submit Review
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
