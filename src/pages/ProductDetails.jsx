@@ -16,7 +16,7 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
-
+  
   useEffect(() => {
     const fetchProduct = async () => {
       try {

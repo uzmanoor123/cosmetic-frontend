@@ -2,21 +2,7 @@ import Navbar from "../components/Navbar";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getProductsAPI, deleteProductAPI } from "../lib/API";
-import {
-  FiPlus,
-  FiEdit2,
-  FiTrash2,
-  FiBox,
-  FiGrid,
-  FiSearch,
-  FiCreditCard,
-  FiDollarSign,
-  FiCheckCircle,
-  FiRefreshCcw,
-  FiUser,
-  FiCalendar,
-  FiClock,
-} from "react-icons/fi";
+import { FiPlus, FiEdit2, FiTrash2, FiBox, FiGrid, FiSearch, FiCreditCard, FiDollarSign, FiCheckCircle, FiRefreshCcw, FiUser, FiCalendar, FiClock, } from "react-icons/fi";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -27,7 +13,7 @@ const AdminDashboard = () => {
   const [loadingTransactions, setLoadingTransactions] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-
+  const [deleteProduct, setDeleteProduct] = useState(null);
   useEffect(() => {
     const fetchProducts = async () => {
       const result = await getProductsAPI();
@@ -80,22 +66,24 @@ const AdminDashboard = () => {
     navigate(`/admin/edit-product/${productId}`);
   };
 
-  const handleDelete = async (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this product?"
-    );
+  const handleDelete = (product) => {
+    setDeleteProduct(product);
+  };
 
-    if (!confirmDelete) return;
+  const confirmDelete = async () => {
+    if (!deleteProduct) return;
 
     try {
-      const result = await deleteProductAPI(id);
+      const result = await deleteProductAPI(deleteProduct._id);
 
       if (result.success) {
-        alert("Product deleted successfully");
-
         setProducts(
-          products.filter((product) => product._id !== id)
+          products.filter(
+            (product) => product._id !== deleteProduct._id
+          )
         );
+
+        setDeleteProduct(null);
       } else {
         alert(result.message);
       }
@@ -205,11 +193,10 @@ const AdminDashboard = () => {
           <div className="bg-gray-100/80 p-1.5 rounded-xl border border-gray-200/60 flex items-center gap-1">
             <button
               onClick={() => setActiveTab("products")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition ${
-                activeTab === "products"
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition ${activeTab === "products"
                   ? "bg-[#ec008c] text-white shadow-sm"
                   : "text-gray-600 hover:text-gray-900"
-              }`}
+                }`}
             >
               <FiBox className="text-sm" />
               Products
@@ -217,11 +204,10 @@ const AdminDashboard = () => {
 
             <button
               onClick={() => setActiveTab("transactions")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition ${
-                activeTab === "transactions"
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition ${activeTab === "transactions"
                   ? "bg-[#ec008c] text-white shadow-sm"
                   : "text-gray-600 hover:text-gray-900"
-              }`}
+                }`}
             >
               <FiGrid className="text-sm" />
               Transactions
@@ -324,7 +310,7 @@ const AdminDashboard = () => {
 
                         <button
                           onClick={() =>
-                            handleDelete(product._id)
+                            handleDelete(product)
                           }
                           className="flex items-center gap-1.5 text-xs text-red-500 font-medium px-3 py-1.5 rounded-lg border border-red-200 hover:bg-red-50 transition"
                         >
@@ -592,7 +578,7 @@ const AdminDashboard = () => {
 
                         <td className="py-5 px-5">
                           {order.paymentStatus ===
-                          "refunded" ? (
+                            "refunded" ? (
                             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 text-blue-600 text-xs font-semibold">
                               <FiRefreshCcw />
                               Refunded
@@ -638,7 +624,7 @@ const AdminDashboard = () => {
 
                         <td className="py-5 px-5 text-right">
                           {order.paymentStatus ===
-                          "paid" ? (
+                            "paid" ? (
                             <button
                               onClick={() =>
                                 handleRefund(order._id)
@@ -667,6 +653,60 @@ const AdminDashboard = () => {
             )}
           </div>
         </main>
+      )}
+      {deleteProduct && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[100] px-4">
+
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+
+            <div className="flex items-center justify-between mb-5">
+
+              <h2 className="text-xl font-bold text-gray-800">
+                Delete Product
+              </h2>
+
+              <button
+                onClick={() => setDeleteProduct(null)}
+                className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500"
+              >
+                <span className="text-xl">×</span>
+              </button>
+
+            </div>
+
+            <div className="mb-6">
+
+              <p className="text-gray-600">
+                Are you sure you want to delete this product?
+              </p>
+
+              <p className="font-semibold text-gray-800 mt-3">
+                {deleteProduct.name}
+              </p>
+
+            </div>
+
+            <div className="flex justify-end gap-3">
+
+              <button
+                onClick={() => setDeleteProduct(null)}
+                className="px-5 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-100 transition"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={confirmDelete}
+                className="px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold transition"
+              >
+                Delete
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
       )}
     </div>
   );

@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
-import { FiMinus, FiPlus, FiTrash2,  FiArrowLeft,} from "react-icons/fi";
+import { FiMinus, FiPlus, FiTrash2, FiArrowLeft,FiX } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import {getCartAPI,increaseCartAPI,decreaseCartAPI,removeCartItemAPI, createCheckoutSessionAPI} from "../lib/API";
+import { getCartAPI, increaseCartAPI, decreaseCartAPI, removeCartItemAPI, createCheckoutSessionAPI } from "../lib/API";
 
 const Cart = () => {
   const navigate = useNavigate();
 
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const [deleteProduct, setDeleteProduct] = useState(null);
   useEffect(() => {
     fetchCart();
   }, []);
@@ -35,7 +35,7 @@ const Cart = () => {
       if (result.success) {
         setCart(result.cart);
 
-    
+
         window.dispatchEvent(new Event("cartUpdated"));
       } else {
         alert(result.message);
@@ -53,7 +53,7 @@ const Cart = () => {
       if (result.success) {
         setCart(result.cart);
 
-  
+
         window.dispatchEvent(new Event("cartUpdated"));
       } else {
         alert(result.message);
@@ -63,20 +63,22 @@ const Cart = () => {
     }
   };
 
-  const handleRemove = async (productId) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to remove this product?"
-    );
+  const handleRemove = (product) => {
+    setDeleteProduct(product);
+  };
 
-    if (!confirmDelete) return;
+  const confirmDelete = async () => {
+    if (!deleteProduct) return;
 
     try {
-      const result = await removeCartItemAPI(productId);
+      const result = await removeCartItemAPI(deleteProduct._id);
 
       if (result.success) {
         setCart(result.cart);
 
         window.dispatchEvent(new Event("cartUpdated"));
+
+        setDeleteProduct(null);
       } else {
         alert(result.message);
       }
@@ -84,27 +86,28 @@ const Cart = () => {
       console.log("Remove cart error:", error);
     }
   };
-const handleCheckout = async () => {
-  const token = localStorage.getItem("token");
 
-  if (!token) {
-    navigate("/login");
-    return;
-  }
+  const handleCheckout = async () => {
+    const token = localStorage.getItem("token");
 
-  try {
-    const result = await createCheckoutSessionAPI();
-
-    if (result.success && result.url) {
-      window.location.href = result.url;
-    } else {
-      alert(result.message || "Unable to proceed to checkout");
+    if (!token) {
+      navigate("/login");
+      return;
     }
-  } catch (error) {
-    console.log("Checkout error:", error);
-    alert("Something went wrong");
-  }
-};
+
+    try {
+      const result = await createCheckoutSessionAPI();
+
+      if (result.success && result.url) {
+        window.location.href = result.url;
+      } else {
+        alert(result.message || "Unable to proceed to checkout");
+      }
+    } catch (error) {
+      console.log("Checkout error:", error);
+      alert("Something went wrong");
+    }
+  };
 
   if (loading) {
     return (
@@ -140,7 +143,7 @@ const handleCheckout = async () => {
 
             <div className="flex items-center gap-3">
 
-          
+
               <button
                 onClick={() => navigate("/home")}
                 className="w-10 h-10 border border-gray-300 rounded-xl flex items-center justify-center text-gray-600 hover:bg-gray-100 transition"
@@ -149,7 +152,7 @@ const handleCheckout = async () => {
                 <FiArrowLeft size={20} />
               </button>
 
-             
+
               <button
                 onClick={() => navigate("/home")}
                 className="border border-pink-600 text-pink-600 hover:bg-pink-600 hover:text-white px-5 py-2.5 rounded-xl font-semibold transition"
@@ -186,7 +189,7 @@ const handleCheckout = async () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-           
+
               <div className="lg:col-span-2 space-y-4">
 
                 {items.map((item) => (
@@ -250,7 +253,7 @@ const handleCheckout = async () => {
 
                     <button
                       onClick={() =>
-                        handleRemove(item.product._id)
+                        handleRemove(item.product)
                       }
                       className="text-red-500 hover:text-red-700 transition"
                       title="Remove product"
@@ -287,7 +290,7 @@ const handleCheckout = async () => {
                 </div>
 
                 <button
-                 onClick={handleCheckout}
+                  onClick={handleCheckout}
                   className="w-full mt-6 bg-[#ec008c] hover:bg-[#c90077] text-white py-3 rounded-xl font-semibold transition"
                 >
                   Checkout
@@ -302,6 +305,59 @@ const handleCheckout = async () => {
         </div>
 
       </div>
+      {deleteProduct && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[100] px-4">
+
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6">
+
+            <div className="flex items-center justify-between mb-5">
+
+              <h2 className="text-xl font-bold text-gray-800">
+                Remove Product
+              </h2>
+
+              <button
+                onClick={() => setDeleteProduct(null)}
+                className="w-12 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500 "
+              >
+                <FiX size={20} />
+              </button>
+
+            </div>
+
+            <div className="mb-6">
+
+              <p className="text-gray-600">
+                Are you sure you want to remove this product from your cart?
+              </p>
+
+              <p className="font-semibold text-gray-800 mt-3">
+                {deleteProduct.name}
+              </p>
+
+            </div>
+
+            <div className="flex justify-end gap-3">
+
+              <button
+                onClick={() => setDeleteProduct(null)}
+                className="px-5 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-100 transition"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={confirmDelete}
+                className="px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold transition"
+              >
+                Delete
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+      )}
     </>
   );
 };
