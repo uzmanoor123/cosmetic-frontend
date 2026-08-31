@@ -2,10 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FiArrowLeft, FiMinus, FiPlus, FiHeart, FiShoppingCart, } from "react-icons/fi";
 import { FaStar } from "react-icons/fa";
-
 import Navbar from "../components/Navbar";
-
-import { getProductByIdAPI, addToCartAPI, getProductsAPI } from "../lib/API";
+import { getProductByIdAPI, addToCartAPI, getProductsAPI, getProductReviewsAPI } from "../lib/API";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -13,10 +11,13 @@ const ProductDetail = () => {
 
   const [product, setProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [averageRating, setAverageRating] = useState(0);
+  const [totalReviews, setTotalReviews] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
-  
+
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -37,6 +38,24 @@ const ProductDetail = () => {
     };
 
     fetchProduct();
+  }, [id]);
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const result = await getProductReviewsAPI(id);
+
+        if (result.success) {
+          setReviews(result.reviews || []);
+          setAverageRating(result.averageRating || 0);
+          setTotalReviews(result.totalReviews || 0);
+        }
+      } catch (error) {
+        console.log("Reviews error:", error);
+      }
+    };
+
+    fetchReviews();
   }, [id]);
 
   useEffect(() => {
@@ -159,14 +178,15 @@ const ProductDetail = () => {
                 <div className="relative w-full h-[400px] bg-gray-50 rounded-2xl overflow-hidden flex items-center justify-center">
                   {product.badge && (
                     <span
-                      className={`absolute top-4 left-4 px-3 py-1 rounded-full text-white text-xs font-semibold z-10 ${product.badgeColor === "Pink"
+                      className={`absolute top-4 left-4 px-3 py-1 rounded-full text-white text-xs font-semibold z-10 ${
+                        product.badgeColor === "Pink"
                           ? "bg-pink-500"
                           : product.badgeColor === "Green"
-                            ? "bg-green-500"
-                            : product.badgeColor === "Blue"
-                              ? "bg-blue-500"
-                              : "bg-orange-500"
-                        }`}
+                          ? "bg-green-500"
+                          : product.badgeColor === "Blue"
+                          ? "bg-blue-500"
+                          : "bg-orange-500"
+                      }`}
                     >
                       {product.badge}
                     </span>
@@ -189,16 +209,30 @@ const ProductDetail = () => {
                   {product.name}
                 </h1>
 
-                <div className="flex items-center gap-2 mt-4">
+                <div className="flex items-center gap-3 mt-4">
                   <div className="flex gap-1 text-amber-400">
-                    <FaStar />
-                    <FaStar />
-                    <FaStar />
-                    <FaStar />
-                    <FaStar />
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <FaStar
+                        key={star}
+                        className={
+                          star <= Math.round(averageRating)
+                            ? "text-amber-400"
+                            : "text-gray-300"
+                        }
+                      />
+                    ))}
                   </div>
 
-                  <span className="text-sm text-gray-400">(reviews)</span>
+                  <span className="text-sm font-semibold text-gray-700">
+                    {averageRating > 0
+                      ? averageRating.toFixed(1)
+                      : "No rating"}
+                  </span>
+
+                  <span className="text-sm text-gray-400">
+                    ({totalReviews}{" "}
+                    {totalReviews === 1 ? "Review" : "Reviews"})
+                  </span>
                 </div>
 
                 <div className="flex items-center gap-3 mt-5">
@@ -227,7 +261,9 @@ const ProductDetail = () => {
                 </div>
 
                 <div className="flex items-center gap-4 mt-6">
-                  <span className="font-medium text-gray-700">Quantity:</span>
+                  <span className="font-medium text-gray-700">
+                    Quantity:
+                  </span>
 
                   <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
                     <button
@@ -260,9 +296,9 @@ const ProductDetail = () => {
 
                     {adding
                       ? "Adding..."
-                      : `Add to Cart - $${(product.price * quantity).toFixed(
-                        2,
-                      )}`}
+                      : `Add to Cart - $${(
+                          product.price * quantity
+                        ).toFixed(2)}`}
                   </button>
 
                   <button className="w-12 h-12 border border-pink-500 text-pink-500 rounded-xl flex items-center justify-center hover:bg-pink-50 transition">
@@ -273,7 +309,9 @@ const ProductDetail = () => {
                 <div className="border-t border-gray-300 mt-6 pt-5">
                   <div className="grid grid-cols-3 gap-3">
                     <div className="text-center">
-                      <p className="text-green-500 text-sm">✓ Free Shipping</p>
+                      <p className="text-green-500 text-sm">
+                        ✓ Free Shipping
+                      </p>
 
                       <p className="text-[10px] text-gray-400 mt-1">
                         Orders over $50
@@ -281,7 +319,9 @@ const ProductDetail = () => {
                     </div>
 
                     <div className="text-center">
-                      <p className="text-green-500 text-sm">✓ 30-Day Returns</p>
+                      <p className="text-green-500 text-sm">
+                        ✓ 30-Day Returns
+                      </p>
 
                       <p className="text-[10px] text-gray-400 mt-1">
                         Money back guarantee
@@ -289,7 +329,9 @@ const ProductDetail = () => {
                     </div>
 
                     <div className="text-center">
-                      <p className="text-green-500 text-sm">✓ Secure Payment</p>
+                      <p className="text-green-500 text-sm">
+                        ✓ Secure Payment
+                      </p>
 
                       <p className="text-[10px] text-gray-400 mt-1">
                         SSL encrypted
@@ -330,25 +372,33 @@ const ProductDetail = () => {
                           Array.isArray(product.benefits) ? (
                             product.benefits.map((benefit, index) => (
                               <p key={index} className="mb-2">
-                                <span className="text-green-500 mr-2">✓</span>
+                                <span className="text-green-500 mr-2">
+                                  ✓
+                                </span>
                                 {benefit}
                               </p>
                             ))
                           ) : (
                             <p>
-                              <span className="text-green-500 mr-2">✓</span>
+                              <span className="text-green-500 mr-2">
+                                ✓
+                              </span>
                               {product.benefits}
                             </p>
                           )
                         ) : (
                           <>
                             <p className="mb-2">
-                              <span className="text-green-500 mr-2">✓</span>
+                              <span className="text-green-500 mr-2">
+                                ✓
+                              </span>
                               Moisturizes
                             </p>
 
                             <p>
-                              <span className="text-green-500 mr-2">✓</span>
+                              <span className="text-green-500 mr-2">
+                                ✓
+                              </span>
                               Softens
                             </p>
                           </>
@@ -358,6 +408,50 @@ const ProductDetail = () => {
                   </div>
                 </div>
               </div>
+            </div>
+
+            <div className="border-t border-gray-200 mt-10 pt-8">
+              <h2 className="text-2xl font-bold text-gray-800 mb-6">
+                Customer Reviews
+              </h2>
+
+              {reviews.length === 0 ? (
+                <p className="text-gray-500">
+                  No reviews yet.
+                </p>
+              ) : (
+                <div className="space-y-5">
+                  {reviews.map((review) => (
+                    <div
+                      key={review._id}
+                      className="border-b border-gray-100 pb-5"
+                    >
+                      <div className="flex items-center justify-between gap-4">
+                        <p className="font-semibold text-gray-800">
+                          {review.user?.name || "Customer"}
+                        </p>
+
+                        <div className="flex gap-1 text-amber-400">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <FaStar
+                              key={star}
+                              className={
+                                star <= review.rating
+                                  ? "text-amber-400"
+                                  : "text-gray-300"
+                              }
+                            />
+                          ))}
+                        </div>
+                      </div>
+
+                      <p className="text-gray-600 mt-2">
+                        {review.comment}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -374,7 +468,9 @@ const ProductDetail = () => {
                     className="bg-white rounded-xl p-3 shadow-sm border border-gray-100"
                   >
                     <div
-                      onClick={() => navigate(`/product/${item._id}`)}
+                      onClick={() =>
+                        navigate(`/product/${item._id}`)
+                      }
                       className="cursor-pointer"
                     >
                       <div className="relative h-40 bg-gray-50 rounded-lg overflow-hidden">
@@ -391,7 +487,9 @@ const ProductDetail = () => {
                         />
                       </div>
 
-                      <p className="text-xs text-gray-400 mt-3">{item.brand}</p>
+                      <p className="text-xs text-gray-400 mt-3">
+                        {item.brand}
+                      </p>
 
                       <h3 className="font-semibold text-sm text-gray-800 line-clamp-1">
                         {item.name}
@@ -403,7 +501,9 @@ const ProductDetail = () => {
                     </div>
 
                     <button
-                      onClick={() => handleRelatedAddToCart(item._id)}
+                      onClick={() =>
+                        handleRelatedAddToCart(item._id)
+                      }
                       className="w-full mt-3 bg-[#ec008c] hover:bg-[#c90077] text-white py-2 rounded-lg text-sm font-semibold"
                     >
                       Add to Cart

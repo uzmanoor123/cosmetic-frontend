@@ -8,6 +8,7 @@ const ShoppingHistory = () => {
   const [reviewProduct, setReviewProduct] = useState(null);
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
+  const [reviewedProducts, setReviewedProducts] = useState([]);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -16,6 +17,20 @@ const ShoppingHistory = () => {
 
         if (result.success) {
           setOrders(result.orders || []);
+
+          const reviewed = [];
+
+          (result.orders || []).forEach((order) => {
+            if (order.reviews) {
+              order.reviews.forEach((review) => {
+                reviewed.push(
+                  `${order._id}-${review.product}`
+                );
+              });
+            }
+          });
+
+          setReviewedProducts(reviewed);
         } else {
           setOrders([]);
         }
@@ -29,6 +44,16 @@ const ShoppingHistory = () => {
 
     fetchOrders();
   }, []);
+
+  const getProductId = (item) => {
+    return item.product?._id || item.product;
+  };
+
+  const isProductReviewed = (orderId, productId) => {
+    return reviewedProducts.includes(
+      `${orderId}-${productId}`
+    );
+  };
 
   const handleReviewSubmit = async () => {
     if (!comment.trim()) {
@@ -45,11 +70,18 @@ const ShoppingHistory = () => {
       );
 
       if (result.success) {
-        alert("Review added successfully");
+        const reviewKey = `${reviewProduct.orderId}-${reviewProduct.productId}`;
+
+        setReviewedProducts((prev) => [
+          ...prev,
+          reviewKey,
+        ]);
 
         setReviewProduct(null);
         setRating(5);
         setComment("");
+
+        alert("Review added successfully");
       } else {
         alert(result.message);
       }
@@ -104,7 +136,9 @@ const ShoppingHistory = () => {
                       </h2>
 
                       <p className="text-sm text-gray-500 mt-1">
-                        {new Date(order.createdAt).toLocaleDateString()}
+                        {new Date(
+                          order.createdAt
+                        ).toLocaleDateString()}
                       </p>
                     </div>
 
@@ -120,51 +154,74 @@ const ShoppingHistory = () => {
                   </div>
 
                   <div className="space-y-4">
-                    {order.items.map((item, index) => (
-                      <div
-                        key={index}
-                        className="flex flex-col md:flex-row md:items-center gap-4 border-b border-gray-100 pb-4"
-                      >
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="w-20 h-20 object-cover rounded-lg bg-gray-50"
-                        />
+                    {order.items.map((item, index) => {
+                      const productId = getProductId(item);
 
-                        <div className="flex-1">
-                          <p className="font-medium text-gray-800">
-                            {item.name}
+                      const alreadyReviewed =
+                        isProductReviewed(
+                          order._id,
+                          productId
+                        );
+
+                      return (
+                        <div
+                          key={index}
+                          className="flex flex-col md:flex-row md:items-center gap-4 border-b border-gray-100 pb-4"
+                        >
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="w-20 h-20 object-cover rounded-lg bg-gray-50"
+                          />
+
+                          <div className="flex-1">
+                            <p className="font-medium text-gray-800">
+                              {item.name}
+                            </p>
+
+                            <p className="text-sm text-gray-500 mt-1">
+                              Quantity: {item.quantity}
+                            </p>
+
+                            <p className="text-sm text-gray-500 mt-1">
+                              Price: $
+                              {Number(item.price).toFixed(2)}
+                            </p>
+                          </div>
+
+                          <p className="font-semibold text-gray-800">
+                            $
+                            {(
+                              item.price * item.quantity
+                            ).toFixed(2)}
                           </p>
 
-                          <p className="text-sm text-gray-500 mt-1">
-                            Quantity: {item.quantity}
-                          </p>
-
-                          <p className="text-sm text-gray-500 mt-1">
-                            Price: ${Number(item.price).toFixed(2)}
-                          </p>
+                          {order.orderStatus ===
+                            "delivered" && (
+                            alreadyReviewed ? (
+                              <button
+                                disabled
+                                className="px-4 py-2 bg-gray-100 text-gray-400 rounded-lg text-sm font-semibold cursor-not-allowed"
+                              >
+                                Reviewed
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() =>
+                                  setReviewProduct({
+                                    productId,
+                                    orderId: order._id,
+                                  })
+                                }
+                                className="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-lg text-sm font-semibold"
+                              >
+                                Leave Review
+                              </button>
+                            )
+                          )}
                         </div>
-
-                        <p className="font-semibold text-gray-800">
-                          ${(item.price * item.quantity).toFixed(2)}
-                        </p>
-
-                        {order.orderStatus === "delivered" && (
-                          <button
-                            onClick={() =>
-                              setReviewProduct({
-                                productId:
-                                  item.product?._id || item.product,
-                                orderId: order._id,
-                              })
-                            }
-                            className="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-lg text-sm font-semibold"
-                          >
-                            Leave Review
-                          </button>
-                        )}
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
 
                   <div className="flex justify-between items-center mt-5 pt-4 border-t border-gray-200">
@@ -173,7 +230,8 @@ const ShoppingHistory = () => {
                     </span>
 
                     <span className="font-bold text-pink-600 text-lg">
-                      ${Number(order.totalAmount).toFixed(2)}
+                      $
+                      {Number(order.totalAmount).toFixed(2)}
                     </span>
                   </div>
                 </div>
@@ -197,7 +255,9 @@ const ShoppingHistory = () => {
 
               <select
                 value={rating}
-                onChange={(e) => setRating(Number(e.target.value))}
+                onChange={(e) =>
+                  setRating(Number(e.target.value))
+                }
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 outline-none"
               >
                 <option value={5}>5 - Excellent</option>
@@ -215,7 +275,9 @@ const ShoppingHistory = () => {
 
               <textarea
                 value={comment}
-                onChange={(e) => setComment(e.target.value)}
+                onChange={(e) =>
+                  setComment(e.target.value)
+                }
                 placeholder="Write your review..."
                 rows="4"
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 outline-none resize-none"

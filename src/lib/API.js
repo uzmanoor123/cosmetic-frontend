@@ -292,3 +292,19 @@ export const createReviewAPI = async (productId, orderId,rating,comment) => {
     };
   }
 };
+export const getProductReviewsAPI = async (productId) => {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/api/reviews/product/${productId}`
+    );
+
+    return await response.json();
+  } catch (error) {
+    console.log("Get reviews error:", error);
+
+    return {
+      success: false,
+      message: "Unable to get reviews",
+    };
+  }
+};
