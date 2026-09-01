@@ -10,7 +10,7 @@ import Cart from "./pages/Cart";
 import ProductDetails from "./pages/ProductDetails";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import ShoppingHistory from "./pages/ShoppingHistory";
-
+import SkinAI from "./pages/SkinAI";
 function App() {
   return (
     <BrowserRouter>
@@ -87,6 +87,10 @@ function App() {
               <ShoppingHistory />
             </ProtectedRoute>
           }
+        />
+        <Route
+          path="/skin-ai"
+          element={<SkinAI />}
         />
       </Routes>
     </BrowserRouter>

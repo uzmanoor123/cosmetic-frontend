@@ -2,7 +2,8 @@ import Navbar from "../components/Navbar";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Sparkles } from "lucide-react";
-import {registerAPI} from "../lib/API.js";
+import { registerAPI } from "../lib/API.js";
+import Swal from "sweetalert2";
 const Register = () => {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -11,29 +12,50 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
       const result = await registerAPI({
         name: fullName,
         email,
-        password
+        password,
       });
+
       if (result.success) {
+        await Swal.fire({
+          icon: "success",
+          title: "Account Created!",
+          text: "Your account has been created successfully.",
+          confirmButtonColor: "#ec008c",
+        });
+
         navigate("/login");
       } else {
-        alert(result.message);
+        Swal.fire({
+          icon: "error",
+          title: "Registration Failed",
+          text: result.message,
+          confirmButtonColor: "#ec008c",
+        });
       }
     } catch (error) {
       console.error("Error registering user:", error);
+
+      Swal.fire({
+        icon: "error",
+        title: "Something went wrong",
+        text: "Unable to create your account.",
+        confirmButtonColor: "#ec008c",
+      });
     }
   };
 
   return (
     <div className="min-h-screen bg-[#f8f9fa] flex flex-col justify-between text-gray-800">
-  
+
       <Navbar />
 
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-12">
-      
+
         <div className="flex flex-col items-center mb-8">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-10 h-10 rounded-full bg-[#ec008c] flex items-center justify-center text-white">

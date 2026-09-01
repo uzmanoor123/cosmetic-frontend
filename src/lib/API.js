@@ -308,3 +308,68 @@ export const getProductReviewsAPI = async (productId) => {
     };
   }
 };
+export const getAIRecommendationsAPI = async (skinProblem) => {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/api/ai/recommend`,
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+          skinProblem,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    console.log("AI Recommendation Response:", data);
+
+    return data;
+  } catch (error) {
+    console.error(
+      "AI Recommendation API Error:",
+      error
+    );
+
+    return {
+      success: false,
+      message: "Something went wrong.",
+    };
+  }
+};
+export const chatWithAIAPI = async (message) => {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/api/ai/chat`,
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+          message,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    console.log("AI Chat Response:", data);
+
+    return data;
+  } catch (error) {
+    console.error("AI Chat API Error:", error);
+
+    return {
+      success: false,
+      message: "Something went wrong.",
+    };
+  }
+};

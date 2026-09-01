@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { FiMinus, FiPlus, FiTrash2, FiArrowLeft,FiX } from "react-icons/fi";
+import { FiMinus, FiPlus, FiTrash2, FiArrowLeft, FiX } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { getCartAPI, increaseCartAPI, decreaseCartAPI, removeCartItemAPI, createCheckoutSessionAPI } from "../lib/API";
-
+import Swal from "sweetalert2";
 const Cart = () => {
   const navigate = useNavigate();
 
@@ -35,11 +35,16 @@ const Cart = () => {
       if (result.success) {
         setCart(result.cart);
 
-
         window.dispatchEvent(new Event("cartUpdated"));
       } else {
-        alert(result.message);
+        Swal.fire({
+          icon: "error",
+          title: "Unable to Increase",
+          text: result.message,
+          confirmButtonColor: "#ec008c",
+        });
       }
+
     } catch (error) {
       console.log("Increase error:", error);
     }
@@ -56,7 +61,12 @@ const Cart = () => {
 
         window.dispatchEvent(new Event("cartUpdated"));
       } else {
-        alert(result.message);
+        Swal.fire({
+          icon: "error",
+          title: "Unable to Decrease",
+          text: result.message,
+          confirmButtonColor: "#ec008c",
+        });
       }
     } catch (error) {
       console.log("Decrease error:", error);
@@ -80,7 +90,12 @@ const Cart = () => {
 
         setDeleteProduct(null);
       } else {
-        alert(result.message);
+        Swal.fire({
+          icon: "error",
+          title: "Remove Failed",
+          text: result.message,
+          confirmButtonColor: "#ec008c",
+        });
       }
     } catch (error) {
       console.log("Remove cart error:", error);
@@ -101,11 +116,22 @@ const Cart = () => {
       if (result.success && result.url) {
         window.location.href = result.url;
       } else {
-        alert(result.message || "Unable to proceed to checkout");
+        Swal.fire({
+          icon: "error",
+          title: "Checkout Failed",
+          text: result.message || "Unable to proceed to checkout",
+          confirmButtonColor: "#ec008c",
+        });
       }
     } catch (error) {
       console.log("Checkout error:", error);
-      alert("Something went wrong");
+
+      Swal.fire({
+        icon: "error",
+        title: "Something went wrong",
+        text: "Unable to proceed to checkout.",
+        confirmButtonColor: "#ec008c",
+      });
     }
   };
 

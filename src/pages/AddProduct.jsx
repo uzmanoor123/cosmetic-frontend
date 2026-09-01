@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { addProductAPI, getProductByIdAPI, updateProductAPI } from './../lib/API';
 import { useParams } from "react-router-dom";
+import Swal from "sweetalert2";
 const AddProduct = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -76,13 +77,32 @@ const AddProduct = () => {
         result = await addProductAPI(productData);
       }
       if (result.success) {
-        alert(id ? "Product Updated Successfully" : "Product Added Successfully");
+        await Swal.fire({
+          icon: "success",
+          title: id ? "Product Updated!" : "Product Added!",
+          text: id
+            ? "Product has been updated successfully." 
+            : "Product has been added successfully.",
+          confirmButtonColor: "#ec008c",
+        });
         navigate("/admin");
-      } else {
-        alert(result.message);
       }
-    } catch (error) {
+      else {
+        Swal.fire({
+          icon: "error",
+          title: "Something went wrong",
+          text: result.message,
+          confirmButtonColor: "#ec008c",
+        });
+      }
+    }
+    catch (error) {
       console.log(error);
+      Swal.fire({
+        icon: "error", title: "Something went wrong",
+        text: "Unable to save product.",
+        confirmButtonColor: "#ec008c",
+      });
     }
   };
 

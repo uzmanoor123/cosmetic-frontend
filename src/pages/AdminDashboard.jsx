@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getProductsAPI, deleteProductAPI, updateOrderStatusAPI, } from "../lib/API";
 import { FiPlus, FiEdit2, FiTrash2, FiBox, FiGrid, FiSearch, FiCreditCard, FiDollarSign, FiCheckCircle, FiRefreshCcw, FiUser, FiCalendar, FiClock, } from "react-icons/fi";
-
+import Swal from "sweetalert2";
 const AdminDashboard = () => {
   const navigate = useNavigate();
 
@@ -86,7 +86,12 @@ const AdminDashboard = () => {
 
         setDeleteProduct(null);
       } else {
-        alert(result.message);
+        Swal.fire({
+          icon: "error",
+          title: "Delete Failed",
+          text: result.message,
+          confirmButtonColor: "#ec008c",
+        });
       }
     } catch (error) {
       console.log(error);
@@ -94,11 +99,18 @@ const AdminDashboard = () => {
   };
 
   const handleRefund = async (orderId) => {
-    const confirmRefund = window.confirm(
-      "Are you sure you want to refund this transaction?"
-    );
+    const confirmRefund = await Swal.fire({
+      icon: "warning",
+      title: "Refund Transaction?",
+      text: "Are you sure you want to refund this transaction?",
+      showCancelButton: true,
+      confirmButtonColor: "#ec008c",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "Yes, Refund",
+      cancelButtonText: "Cancel",
+    });
 
-    if (!confirmRefund) return;
+    if (!confirmRefund.isConfirmed) return;
 
     try {
       const token = localStorage.getItem("token");
@@ -116,14 +128,29 @@ const AdminDashboard = () => {
       const result = await response.json();
 
       if (result.success) {
-        alert("Transaction refunded successfully");
+        Swal.fire({
+          icon: "success",
+          title: "Refund Successful!",
+          text: "Transaction has been refunded successfully.",
+          confirmButtonColor: "#ec008c",
+        });
         fetchTransactions();
       } else {
-        alert(result.message);
+        Swal.fire({
+          icon: "error",
+          title: "Refund Failed",
+          text: result.message,
+          confirmButtonColor: "#ec008c",
+        });
       }
     } catch (error) {
       console.log("Refund error:", error);
-      alert("Something went wrong");
+      Swal.fire({
+        icon: "error",
+        title: "Something went wrong",
+        text: "Unable to process refund.",
+        confirmButtonColor: "#ec008c",
+      });
     }
   };
 
@@ -139,18 +166,28 @@ const AdminDashboard = () => {
           prevTransactions.map((order) =>
             order._id === orderId
               ? {
-                  ...order,
-                  orderStatus: newStatus,
-                }
+                ...order,
+                orderStatus: newStatus,
+              }
               : order
           )
         );
       } else {
-        alert(result.message);
+        Swal.fire({
+          icon: "error",
+          title: "Status Update Failed",
+          text: result.message,
+          confirmButtonColor: "#ec008c",
+        });
       }
     } catch (error) {
       console.log("Order status error:", error);
-      alert("Something went wrong");
+      Swal.fire({
+        icon: "error",
+        title: "Something went wrong",
+        text: "Unable to update order status.",
+        confirmButtonColor: "#ec008c",
+      });
     }
   };
 
@@ -221,11 +258,10 @@ const AdminDashboard = () => {
           <div className="bg-gray-100/80 p-1.5 rounded-xl border border-gray-200/60 flex items-center gap-1">
             <button
               onClick={() => setActiveTab("products")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition ${
-                activeTab === "products"
-                  ? "bg-[#ec008c] text-white shadow-sm"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition ${activeTab === "products"
+                ? "bg-[#ec008c] text-white shadow-sm"
+                : "text-gray-600 hover:text-gray-900"
+                }`}
             >
               <FiBox className="text-sm" />
               Products
@@ -233,11 +269,10 @@ const AdminDashboard = () => {
 
             <button
               onClick={() => setActiveTab("transactions")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition ${
-                activeTab === "transactions"
-                  ? "bg-[#ec008c] text-white shadow-sm"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition ${activeTab === "transactions"
+                ? "bg-[#ec008c] text-white shadow-sm"
+                : "text-gray-600 hover:text-gray-900"
+                }`}
             >
               <FiGrid className="text-sm" />
               Transactions
@@ -614,7 +649,7 @@ const AdminDashboard = () => {
 
                         <td className="py-5 px-5">
                           {order.paymentStatus ===
-                          "refunded" ? (
+                            "refunded" ? (
                             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 text-blue-600 text-xs font-semibold">
                               <FiRefreshCcw />
                               Refunded

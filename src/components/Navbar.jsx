@@ -6,6 +6,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { getCartAPI } from "../lib/API";
 import { MdHistory } from "react-icons/md";
+
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -62,7 +63,7 @@ const Navbar = () => {
   };
 
   const handleAIConsultant = () => {
-    navigate("/ai-consultant");
+    navigate("/skin-ai");
   };
 
   const handleLogout = () => {

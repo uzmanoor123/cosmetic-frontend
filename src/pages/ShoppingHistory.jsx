@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import { getMyOrdersAPI, createReviewAPI } from "../lib/API";
-
+import Swal from "sweetalert2";
 const ShoppingHistory = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -55,41 +55,68 @@ const ShoppingHistory = () => {
     );
   };
 
-  const handleReviewSubmit = async () => {
-    if (!comment.trim()) {
-      alert("Please write a review");
-      return;
+const handleReviewSubmit = async () => {
+  if (!comment.trim()) {
+    Swal.fire({
+      icon: "warning",
+      title: "Review Required",
+      text: "Please write a review before submitting.",
+      confirmButtonColor: "#ec008c",
+    });
+    return;
+  }
+  console.log("Review Data:", {
+  productId: reviewProduct?.productId,
+  orderId: reviewProduct?.orderId,
+  rating,
+  comment,
+});
+
+  try {
+    const result = await createReviewAPI(
+      reviewProduct.productId,
+      reviewProduct.orderId,
+      rating,
+      comment
+    );
+
+    if (result.success) {
+      const reviewKey = `${reviewProduct.orderId}-${reviewProduct.productId}`;
+
+      setReviewedProducts((prev) => [
+        ...prev,
+        reviewKey,
+      ]);
+
+      setReviewProduct(null);
+      setRating(5);
+      setComment("");
+
+      Swal.fire({
+        icon: "success",
+        title: "Review Added!",
+        text: "Your review has been added successfully.",
+        confirmButtonColor: "#ec008c",
+      });
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Unable to Add Review",
+        text: result.message || "Something went wrong.",
+        confirmButtonColor: "#ec008c",
+      });
     }
+  } catch (error) {
+    console.log("Review error:", error);
 
-    try {
-      const result = await createReviewAPI(
-        reviewProduct.productId,
-        reviewProduct.orderId,
-        rating,
-        comment
-      );
-
-      if (result.success) {
-        const reviewKey = `${reviewProduct.orderId}-${reviewProduct.productId}`;
-
-        setReviewedProducts((prev) => [
-          ...prev,
-          reviewKey,
-        ]);
-
-        setReviewProduct(null);
-        setRating(5);
-        setComment("");
-
-        alert("Review added successfully");
-      } else {
-        alert(result.message);
-      }
-    } catch (error) {
-      console.log("Review error:", error);
-      alert("Something went wrong");
-    }
-  };
+    Swal.fire({
+      icon: "error",
+      title: "Something Went Wrong",
+      text: "Unable to submit your review. Please try again.",
+      confirmButtonColor: "#ec008c",
+    });
+  }
+};
 
   return (
     <>
