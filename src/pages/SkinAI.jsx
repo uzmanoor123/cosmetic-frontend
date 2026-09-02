@@ -1,13 +1,11 @@
 import { useState } from "react";
-import { getAIRecommendationsAPI, chatWithAIAPI,} from "../lib/API";
-
+import { getAIRecommendationsAPI, chatWithAIAPI, addToCartAPI, } from "../lib/API";
 import Navbar from "../components/Navbar";
-import {RiRobot2Line, RiSparkling2Line, RiArrowLeftLine, RiSendPlaneFill,} from "react-icons/ri";
-
+import { RiRobot2Line, RiSparkling2Line, RiArrowLeftLine, RiSendPlaneFill, } from "react-icons/ri";
 import ReactMarkdown from "react-markdown";
-
+import { useNavigate } from "react-router-dom";
 const SkinAI = () => {
-
+  const navigate = useNavigate();
   const [skinType, setSkinType] = useState("");
   const [concerns, setConcerns] = useState([]);
   const [ageRange, setAgeRange] = useState("");
@@ -17,7 +15,7 @@ const SkinAI = () => {
 
   const [recommendations, setRecommendations] = useState([]);
   const [message, setMessage] = useState("");
-
+  const [beautyTips, setBeautyTips] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -27,9 +25,6 @@ const SkinAI = () => {
   const [chatMessages, setChatMessages] = useState([]);
   const [chatLoading, setChatLoading] = useState(false);
 
-  // =========================
-  // OPTIONS
-  // =========================
 
   const skinTypes = [
     "Oily",
@@ -102,8 +97,8 @@ const SkinAI = () => {
     setError("");
     setRecommendations([]);
     setMessage("");
+    setBeautyTips([]);
 
-    // User information that will be sent to backend
     const skinProblem = `
 Skin type: ${skinType}
 
@@ -126,10 +121,11 @@ Current skincare routine: ${routine || "None"}
       if (data.success) {
         setRecommendations(data.recommendations || []);
         setMessage(data.message || "");
+        setBeautyTips(data.beautyTips || []);
       } else {
         setError(
           data.message ||
-            "Could not generate recommendations."
+          "Could not generate recommendations."
         );
       }
     } catch (error) {
@@ -155,10 +151,7 @@ Current skincare routine: ${routine || "None"}
 
     const userMessage = chatMessage.trim();
 
-    // Clear input
     setChatMessage("");
-
-    // Add user's message to chat
     setChatMessages((prev) => [
       ...prev,
       {
@@ -213,9 +206,21 @@ Current skincare routine: ${routine || "None"}
       setChatLoading(false);
     }
   };
+  const handleAddToCart = async (productId) => {
+  try {
+    const data = await addToCartAPI(productId);
+
+    if (data.success) {
+      window.dispatchEvent(new Event("cartUpdated"));
+    }
+  } catch (error) {
+    console.error("Add to cart error:", error);
+  }
+};
 
 
   return (
+
     <div className="min-h-screen bg-[#f8fafc]">
 
       <Navbar />
@@ -233,7 +238,7 @@ Current skincare routine: ${routine || "None"}
 
             Back to Store
           </button>
-         
+
 
           <div className="mb-7 text-center">
 
@@ -266,11 +271,10 @@ Current skincare routine: ${routine || "None"}
                 onClick={() =>
                   setActiveTab("recommendations")
                 }
-                className={`flex cursor-pointer items-center justify-center gap-2 border-b-2 py-4 text-sm font-medium transition ${
-                  activeTab === "recommendations"
-                    ? "border-pink-500 bg-pink-50 text-pink-600"
-                    : "border-transparent text-slate-600 hover:bg-gray-50"
-                }`}
+                className={`flex cursor-pointer items-center justify-center gap-2 border-b-2 py-4 text-sm font-medium transition ${activeTab === "recommendations"
+                  ? "border-pink-500 bg-pink-50 text-pink-600"
+                  : "border-transparent text-slate-600 hover:bg-gray-50"
+                  }`}
               >
                 <RiSparkling2Line size={18} />
 
@@ -282,11 +286,10 @@ Current skincare routine: ${routine || "None"}
                 onClick={() =>
                   setActiveTab("chatbot")
                 }
-                className={`flex cursor-pointer items-center justify-center gap-2 border-b-2 py-4 text-sm font-medium transition ${
-                  activeTab === "chatbot"
-                    ? "border-pink-500 bg-pink-50 text-pink-600"
-                    : "border-transparent text-slate-600 hover:bg-gray-50"
-                }`}
+                className={`flex cursor-pointer items-center justify-center gap-2 border-b-2 py-4 text-sm font-medium transition ${activeTab === "chatbot"
+                  ? "border-pink-500 bg-pink-50 text-pink-600"
+                  : "border-transparent text-slate-600 hover:bg-gray-50"
+                  }`}
               >
                 <RiRobot2Line size={18} />
 
@@ -316,11 +319,10 @@ Current skincare routine: ${routine || "None"}
                           onClick={() =>
                             setSkinType(type)
                           }
-                          className={`rounded-lg border px-3 py-2.5 text-sm transition ${
-                            skinType === type
-                              ? "border-pink-500 bg-pink-50 font-semibold text-pink-600"
-                              : "border-gray-200 bg-white text-slate-700 hover:border-pink-300"
-                          }`}
+                          className={`rounded-lg border px-3 py-2.5 text-sm transition ${skinType === type
+                            ? "border-pink-500 bg-pink-50 font-semibold text-pink-600"
+                            : "border-gray-200 bg-white text-slate-700 hover:border-pink-300"
+                            }`}
                         >
                           {type}
                         </button>
@@ -348,11 +350,10 @@ Current skincare routine: ${routine || "None"}
                           onClick={() =>
                             handleConcern(concern)
                           }
-                          className={`rounded-lg border px-3 py-2.5 text-sm transition ${
-                            concerns.includes(concern)
-                              ? "border-pink-500 bg-pink-50 font-semibold text-pink-600"
-                              : "border-gray-200 bg-white text-slate-700 hover:border-pink-300"
-                          }`}
+                          className={`rounded-lg border px-3 py-2.5 text-sm transition ${concerns.includes(concern)
+                            ? "border-pink-500 bg-pink-50 font-semibold text-pink-600"
+                            : "border-gray-200 bg-white text-slate-700 hover:border-pink-300"
+                            }`}
                         >
                           {concern}
                         </button>
@@ -379,11 +380,10 @@ Current skincare routine: ${routine || "None"}
                           onClick={() =>
                             setAgeRange(age)
                           }
-                          className={`rounded-lg border px-3 py-2.5 text-sm transition ${
-                            ageRange === age
-                              ? "border-pink-500 bg-pink-50 font-semibold text-pink-600"
-                              : "border-gray-200 bg-white text-slate-700 hover:border-pink-300"
-                          }`}
+                          className={`rounded-lg border px-3 py-2.5 text-sm transition ${ageRange === age
+                            ? "border-pink-500 bg-pink-50 font-semibold text-pink-600"
+                            : "border-gray-200 bg-white text-slate-700 hover:border-pink-300"
+                            }`}
                         >
                           {age}
                         </button>
@@ -410,11 +410,10 @@ Current skincare routine: ${routine || "None"}
                           onClick={() =>
                             setBudget(range)
                           }
-                          className={`rounded-lg border px-3 py-2.5 text-sm transition ${
-                            budget === range
-                              ? "border-pink-500 bg-pink-50 font-semibold text-pink-600"
-                              : "border-gray-200 bg-white text-slate-700 hover:border-pink-300"
-                          }`}
+                          className={`rounded-lg border px-3 py-2.5 text-sm transition ${budget === range
+                            ? "border-pink-500 bg-pink-50 font-semibold text-pink-600"
+                            : "border-gray-200 bg-white text-slate-700 hover:border-pink-300"
+                            }`}
                         >
                           {range}
                         </button>
@@ -500,7 +499,44 @@ Current skincare routine: ${routine || "None"}
               </div>
 
             )}
+            {beautyTips.length > 0 && (
+              <div className="mt-10 rounded-2xl border border-pink-100 bg-white p-6 shadow-sm">
 
+                <div className="flex items-center gap-3">
+
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-pink-100 text-pink-600">
+                    <RiSparkling2Line size={20} />
+                  </div>
+
+                  <h3 className="text-xl font-bold text-slate-900">
+                    Personalized Beauty Tips
+                  </h3>
+
+                </div>
+
+                <div className="mt-5 space-y-3">
+
+                  {beautyTips.map((tip, index) => (
+                    <div
+                      key={index}
+                      className="flex items-start gap-3"
+                    >
+
+                      <span className="mt-1 text-pink-500">
+                        •
+                      </span>
+
+                      <p className="text-sm leading-relaxed text-slate-700">
+                        {tip}
+                      </p>
+
+                    </div>
+                  ))}
+
+                </div>
+
+              </div>
+            )}
 
             {activeTab === "chatbot" && (
 
@@ -537,19 +573,17 @@ Current skincare routine: ${routine || "None"}
 
                           <div
                             key={index}
-                            className={`flex ${
-                              chat.sender === "user"
-                                ? "justify-end"
-                                : "justify-start"
-                            }`}
+                            className={`flex ${chat.sender === "user"
+                              ? "justify-end"
+                              : "justify-start"
+                              }`}
                           >
 
                             <div
-                              className={`max-w-[80%] rounded-lg px-4 py-3 text-sm ${
-                                chat.sender === "user"
-                                  ? "bg-pink-600 text-white"
-                                  : "bg-white text-slate-700 shadow-sm"
-                              }`}
+                              className={`max-w-[80%] rounded-lg px-4 py-3 text-sm ${chat.sender === "user"
+                                ? "bg-pink-600 text-white"
+                                : "bg-white text-slate-700 shadow-sm"
+                                }`}
                             >
 
                               {chat.sender === "user" ? (
@@ -559,8 +593,6 @@ Current skincare routine: ${routine || "None"}
                                 </p>
 
                               ) : (
-
-                                /* AI MESSAGE */
 
                                 <ReactMarkdown
                                   components={{
@@ -699,14 +731,23 @@ Current skincare routine: ${routine || "None"}
             )}
 
           </div>
-
           {recommendations.length > 0 && (
-
             <section className="mt-12">
 
-              <h2 className="mb-7 text-center text-2xl font-bold text-slate-900">
-                Recommended For You
-              </h2>
+              <div className="mb-8 text-center">
+                <p className="text-sm font-semibold uppercase tracking-wider text-pink-500">
+                  AI Powered
+                </p>
+
+                <h2 className="mt-1 text-2xl font-bold text-slate-900 sm:text-3xl">
+                  Recommended For You
+                </h2>
+
+                <p className="mx-auto mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">
+                  Based on your skin type, concerns, preferences, and budget,
+                  here are the products that best match your needs.
+                </p>
+              </div>
 
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
 
@@ -714,52 +755,83 @@ Current skincare routine: ${routine || "None"}
 
                   <div
                     key={product._id}
-                    className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+                    className="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
                   >
 
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="h-64 w-full object-cover"
-                    />
+                    <div className="relative overflow-hidden bg-gray-50">
+
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="h-64 w-full object-cover transition duration-500 group-hover:scale-105"
+                      />
+
+                      <div className="absolute right-3 top-3 rounded-full bg-pink-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm">
+                        {product.matchScore}% Match
+                      </div>
+
+                    </div>
 
                     <div className="p-5">
 
-                      <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
                         {product.brand}
                       </p>
 
-                      <h3 className="mt-1 text-lg font-semibold text-slate-900">
+                      <h3 className="mt-1 min-h-[48px] text-lg font-bold leading-snug text-slate-900">
                         {product.name}
                       </h3>
 
-                      <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-slate-600">
-                        {product.description}
-                      </p>
+                      <div className="mt-3 flex items-center justify-between">
 
-                      <div className="mt-4 rounded-lg bg-pink-50 p-3">
+                        <span className="text-xl font-bold text-slate-900">
+                          ${product.price}
+                        </span>
 
-                        <p className="text-xs font-semibold text-pink-700">
-                          Why we recommend it
-                        </p>
+                        <span className="rounded-full bg-pink-50 px-3 py-1 text-xs font-semibold text-pink-600">
+                          AI Recommended
+                        </span>
 
-                        <p className="mt-1 text-sm leading-relaxed text-slate-700">
+                      </div>
+
+                      <div className="mt-4 rounded-xl bg-pink-50 p-4">
+
+                        <div className="flex items-center gap-2">
+                          <RiSparkling2Line
+                            size={16}
+                            className="text-pink-600"
+                          />
+
+                          <p className="text-xs font-bold uppercase tracking-wide text-pink-700">
+                            Why we recommend it
+                          </p>
+                        </div>
+
+                        <p className="mt-2 text-sm leading-relaxed text-slate-700">
                           {product.reason}
                         </p>
 
                       </div>
 
-                      {/* PRICE + MATCH */}
+                      <div className="mt-5 grid grid-cols-2 gap-2">
 
-                      <div className="mt-4 flex items-center justify-between">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            navigate(`/product/${product._id}`)
+                          }
+                          className="rounded-lg border border-pink-500 px-3 py-2.5 text-sm font-semibold text-pink-600 transition hover:bg-pink-50"
+                        >
+                          View Details
+                        </button>
 
-                        <span className="text-sm font-semibold text-pink-600">
-                          Match: {product.matchScore}%
-                        </span>
-
-                        <span className="text-lg font-bold text-slate-900">
-                          Rs. {product.price}
-                        </span>
+                        <button
+                        onClick={() => handleAddToCart(product._id)}
+                          type="button"
+                          className="rounded-lg bg-pink-600 px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-pink-700"
+                        >
+                          Add to Cart
+                        </button>
 
                       </div>
 
@@ -771,8 +843,37 @@ Current skincare routine: ${routine || "None"}
 
               </div>
 
-            </section>
+              {message && (
+                <div className="mt-10 rounded-2xl border border-pink-100 bg-white p-6 shadow-sm">
 
+                  <div className="flex items-center gap-3">
+
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-pink-100 text-pink-600">
+                      <RiSparkling2Line size={20} />
+                    </div>
+
+                    <div>
+                      <h3 className="text-lg font-bold text-slate-900">
+                        Personalized Beauty Tips
+                      </h3>
+
+                      <p className="mt-1 text-xs text-slate-500">
+                        Tips generated based on your beauty profile
+                      </p>
+                    </div>
+
+                  </div>
+
+                  <div className="mt-4 rounded-xl bg-pink-50 p-4">
+                    <p className="text-sm leading-7 text-slate-700">
+                      {message}
+                    </p>
+                  </div>
+
+                </div>
+              )}
+
+            </section>
           )}
 
         </div>

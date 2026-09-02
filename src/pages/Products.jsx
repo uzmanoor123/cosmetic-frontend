@@ -19,6 +19,10 @@ const Products = () => {
   const [sortBy, setSortBy] = useState("Relevance");
 
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
+  useEffect(() => {
     const urlCategory = searchParams.get("category");
     const urlSearch = searchParams.get("search");
 

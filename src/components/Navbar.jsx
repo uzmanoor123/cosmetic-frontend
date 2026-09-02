@@ -1,3 +1,4 @@
+
 import { FiShoppingCart, FiLogOut, FiSearch } from "react-icons/fi";
 import { RiRobot2Line } from "react-icons/ri";
 import { PiUserPlusLight } from "react-icons/pi";
@@ -13,8 +14,12 @@ const Navbar = () => {
 
   const [search, setSearch] = useState("");
   const [cartCount, setCartCount] = useState(0);
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
-  const [isAdmin, setIsAdmin] = useState(localStorage.getItem("role") === "admin");
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    !!localStorage.getItem("token")
+  );
+  const [isAdmin, setIsAdmin] = useState(
+    localStorage.getItem("role") === "admin"
+  );
 
   useEffect(() => {
     const updateAuth = () => {
@@ -26,6 +31,7 @@ const Navbar = () => {
     };
 
     updateAuth();
+
     window.addEventListener("authUpdated", updateAuth);
 
     return () => {
@@ -59,6 +65,11 @@ const Navbar = () => {
   };
 
   const handleCartClick = () => {
+    if (!isLoggedIn) {
+      navigate("/login");
+      return;
+    }
+
     navigate("/cart");
   };
 
@@ -75,6 +86,7 @@ const Navbar = () => {
     setCartCount(0);
 
     window.dispatchEvent(new Event("authUpdated"));
+
     navigate("/login");
   };
 
@@ -92,6 +104,7 @@ const Navbar = () => {
 
         if (result.success) {
           const items = result.cart?.items || [];
+
           const count = items.reduce(
             (total, item) => total + item.quantity,
             0
@@ -132,7 +145,7 @@ const Navbar = () => {
             strokeLinejoin="round"
             className="w-6 h-6 text-white"
           >
-            <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
+            <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
             <path d="M20 3v4" />
             <path d="M22 5h-4" />
             <path d="M4 17v2" />
@@ -148,68 +161,106 @@ const Navbar = () => {
         </h1>
       </div>
 
-      <form onSubmit={handleSearch} className="relative w-[420px]">
-        <FiSearch
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer"
-          onClick={handleSearch}
-        />
+      {location.pathname !== "/login" &&
+        location.pathname !== "/register" && (
+          <form onSubmit={handleSearch} className="relative w-[420px]">
+            <FiSearch
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer"
+              onClick={handleSearch}
+            />
 
-        <input
-          type="text"
-          placeholder="Search products, brands..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full border border-gray-200 py-2 pl-10 pr-4 rounded-md outline-none focus:border-pink-500"
-        />
-      </form>
+            <input
+              type="text"
+              placeholder="Search products, brands..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full border border-gray-200 py-2 pl-10 pr-4 rounded-md outline-none focus:border-pink-500"
+            />
+          </form>
+        )}
 
       <div className="flex items-center gap-6 text-[22px]">
-        <div
-          className="relative cursor-pointer"
-          onClick={handleAccountClick}
-          title="Account"
-        >
-          <PiUserPlusLight className="hover:text-pink-600 transition" />
-
-          {isAdmin && isLoggedIn && (
-            <IoCheckmarkCircle
-              className="absolute -bottom-1 -right-1 text-green-500 bg-white rounded-full"
-              size={14}
+        {!isLoggedIn ? (
+          <>
+            <RiRobot2Line
+              onClick={handleAIConsultant}
+              className="cursor-pointer hover:text-pink-600 transition"
+              title="AI Consultant"
             />
-          )}
-        </div>
 
-        <RiRobot2Line
-          onClick={handleAIConsultant}
-          className="cursor-pointer hover:text-pink-600 transition"
-          title="AI Consultant"
-        />
+            {location.pathname === "/register" ? (
+              <button
+                type="button"
+                onClick={() => navigate("/login")}
+                className="bg-[#ec008c] hover:bg-[#c90077] text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition shadow-sm"
+              >
+                Login
+              </button>
+            ) : location.pathname === "/login" ? (
+              <button
+                type="button"
+                onClick={() => navigate("/register")}
+                className="bg-[#ec008c] hover:bg-[#c90077] text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition shadow-sm"
+              >
+                Register
+              </button>
+            ) : (
+              <PiUserPlusLight
+                onClick={() => navigate("/login")}
+                className="cursor-pointer hover:text-pink-600 transition"
+                title="Login"
+              />
+            )}
+          </>
+        ) : (
+          <>
+            <div
+              className="relative cursor-pointer"
+              onClick={handleAccountClick}
+              title="Account"
+            >
+              <PiUserPlusLight className="hover:text-pink-600 transition" />
 
-        <div
-          className="relative cursor-pointer"
-          onClick={handleCartClick}
-          title="Cart"
-        >
-          <FiShoppingCart className="hover:text-pink-600 transition" />
+              {isAdmin && (
+                <IoCheckmarkCircle
+                  className="absolute -bottom-1 -right-1 text-green-500 bg-white rounded-full"
+                  size={14}
+                />
+              )}
+            </div>
 
-          {isLoggedIn && cartCount > 0 && (
-            <span className="absolute -top-3 -right-3 bg-pink-600 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
-              {cartCount}
-            </span>
-          )}
-        </div>
-        <MdHistory
-          onClick={() => navigate("/history")}
-          className="cursor-pointer hover:text-pink-600 transition"
-          title="Shopping History"
-        />
+            <RiRobot2Line
+              onClick={handleAIConsultant}
+              className="cursor-pointer hover:text-pink-600 transition"
+              title="AI Consultant"
+            />
 
-        {isLoggedIn && (
-          <FiLogOut
-            onClick={handleLogout}
-            className="cursor-pointer hover:text-pink-600 transition"
-            title="Logout"
-          />
+            <div
+              className="relative cursor-pointer"
+              onClick={handleCartClick}
+              title="Cart"
+            >
+              <FiShoppingCart className="hover:text-pink-600 transition" />
+
+              {cartCount > 0 && (
+                <span className="absolute -top-3 -right-3 bg-pink-600 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
+            </div>
+
+            <MdHistory
+              onClick={() => navigate("/history")}
+              className="cursor-pointer hover:text-pink-600 transition"
+              title="Shopping History"
+            />
+
+            <FiLogOut
+              onClick={handleLogout}
+              className="cursor-pointer hover:text-pink-600 transition"
+              title="Logout"
+            />
+          </>
         )}
       </div>
     </nav>
@@ -217,3 +268,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+

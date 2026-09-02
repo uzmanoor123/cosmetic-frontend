@@ -16,7 +16,9 @@ const ShoppingHistory = () => {
         const result = await getMyOrdersAPI();
 
         if (result.success) {
-          setOrders(result.orders || []);
+          (result.orders || []).sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          )
 
           const reviewed = [];
 
@@ -46,8 +48,15 @@ const ShoppingHistory = () => {
   }, []);
 
   const getProductId = (item) => {
-    return item.product?._id || item.product;
+    const productId = item.product?._id || item.product;
+
+    return typeof productId === "string" && productId.trim()
+      ? productId
+      : productId?.toString?.() || null;
   };
+
+  const hasValidProductId = (productId) =>
+    typeof productId === "string" && /^[a-f\d]{24}$/i.test(productId);
 
   const isProductReviewed = (orderId, productId) => {
     return reviewedProducts.includes(
@@ -55,68 +64,78 @@ const ShoppingHistory = () => {
     );
   };
 
-const handleReviewSubmit = async () => {
-  if (!comment.trim()) {
-    Swal.fire({
-      icon: "warning",
-      title: "Review Required",
-      text: "Please write a review before submitting.",
-      confirmButtonColor: "#ec008c",
-    });
-    return;
-  }
-  console.log("Review Data:", {
-  productId: reviewProduct?.productId,
-  orderId: reviewProduct?.orderId,
-  rating,
-  comment,
-});
-
-  try {
-    const result = await createReviewAPI(
-      reviewProduct.productId,
-      reviewProduct.orderId,
-      rating,
-      comment
-    );
-
-    if (result.success) {
-      const reviewKey = `${reviewProduct.orderId}-${reviewProduct.productId}`;
-
-      setReviewedProducts((prev) => [
-        ...prev,
-        reviewKey,
-      ]);
-
-      setReviewProduct(null);
-      setRating(5);
-      setComment("");
-
+  const handleReviewSubmit = async () => {
+    if (!hasValidProductId(reviewProduct?.productId)) {
       Swal.fire({
-        icon: "success",
-        title: "Review Added!",
-        text: "Your review has been added successfully.",
+        icon: "warning",
+        title: "Product Unavailable",
+        text: "This product is no longer available for review.",
         confirmButtonColor: "#ec008c",
       });
-    } else {
+      return;
+    }
+
+    if (!comment.trim()) {
+      Swal.fire({
+        icon: "warning",
+        title: "Review Required",
+        text: "Please write a review before submitting.",
+        confirmButtonColor: "#ec008c",
+      });
+      return;
+    }
+    console.log("Review Data:", {
+      productId: reviewProduct?.productId,
+      orderId: reviewProduct?.orderId,
+      rating,
+      comment,
+    });
+
+    try {
+      const result = await createReviewAPI(
+        reviewProduct.productId,
+        reviewProduct.orderId,
+        rating,
+        comment
+      );
+
+      if (result.success) {
+        const reviewKey = `${reviewProduct.orderId}-${reviewProduct.productId}`;
+
+        setReviewedProducts((prev) => [
+          ...prev,
+          reviewKey,
+        ]);
+
+        setReviewProduct(null);
+        setRating(5);
+        setComment("");
+
+        Swal.fire({
+          icon: "success",
+          title: "Review Added!",
+          text: "Your review has been added successfully.",
+          confirmButtonColor: "#ec008c",
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Unable to Add Review",
+          text: result.message || "Something went wrong.",
+          confirmButtonColor: "#ec008c",
+        });
+      }
+    } catch (error) {
+      console.log("Review error:", error);
+
       Swal.fire({
         icon: "error",
-        title: "Unable to Add Review",
-        text: result.message || "Something went wrong.",
+        title: "Something Went Wrong",
+        text: "Unable to submit your review. Please try again.",
         confirmButtonColor: "#ec008c",
       });
     }
-  } catch (error) {
-    console.log("Review error:", error);
-
-    Swal.fire({
-      icon: "error",
-      title: "Something Went Wrong",
-      text: "Unable to submit your review. Please try again.",
-      confirmButtonColor: "#ec008c",
-    });
-  }
-};
+  };
 
   return (
     <>
@@ -183,7 +202,6 @@ const handleReviewSubmit = async () => {
                   <div className="space-y-4">
                     {order.items.map((item, index) => {
                       const productId = getProductId(item);
-
                       const alreadyReviewed =
                         isProductReviewed(
                           order._id,
@@ -224,28 +242,29 @@ const handleReviewSubmit = async () => {
                           </p>
 
                           {order.orderStatus ===
-                            "delivered" && (
-                            alreadyReviewed ? (
-                              <button
-                                disabled
-                                className="px-4 py-2 bg-gray-100 text-gray-400 rounded-lg text-sm font-semibold cursor-not-allowed"
-                              >
-                                Reviewed
-                              </button>
-                            ) : (
-                              <button
-                                onClick={() =>
-                                  setReviewProduct({
-                                    productId,
-                                    orderId: order._id,
-                                  })
-                                }
-                                className="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-lg text-sm font-semibold"
-                              >
-                                Leave Review
-                              </button>
-                            )
-                          )}
+                            "delivered" &&
+                            hasValidProductId(productId) && (
+                              alreadyReviewed ? (
+                                <button
+                                  disabled
+                                  className="px-4 py-2 bg-gray-100 text-gray-400 rounded-lg text-sm font-semibold cursor-not-allowed"
+                                >
+                                  Reviewed
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() =>
+                                    setReviewProduct({
+                                      productId,
+                                      orderId: order._id,
+                                    })
+                                  }
+                                  className="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-lg text-sm font-semibold"
+                                >
+                                  Leave Review
+                                </button>
+                              )
+                            )}
                         </div>
                       );
                     })}

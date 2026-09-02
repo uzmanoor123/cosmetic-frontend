@@ -1,7 +1,6 @@
 import Navbar from "../components/Navbar";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FiArrowLeft } from "react-icons/fi";
 import { Sparkles } from "lucide-react";
 import { loginAPI } from "../lib/API.js";
 import Swal from "sweetalert2";
@@ -120,12 +119,6 @@ const Login = () => {
           </p>
         </div>
 
-        <Link
-          to="/"
-          className="flex items-center gap-2 text-xs font-semibold text-[#ec008c] hover:underline mt-8"
-        >
-          <FiArrowLeft className="text-sm" /> Back to Store
-        </Link>
       </main>
     </div>
   );
