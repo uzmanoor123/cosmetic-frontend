@@ -15,7 +15,7 @@ const AiBanner = () => {
           Our AI Beauty Consultant analyzes your skin type, concerns, and preferences to recommend the perfect products just for you.
         </p>
         <button 
-        onClick={() => navigate("/ai-consultant")}
+        onClick={() => navigate("/skin-ai")}
         className="bg-white text-[#ec008c] font-semibold px-8 py-3 rounded-md hover:bg-pink-50 transition shadow-md flex items-center gap-2">
           <RiRobot2Line className="text-xl" /> Try AI Recommendation
         </button>

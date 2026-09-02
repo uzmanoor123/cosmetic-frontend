@@ -31,7 +31,7 @@ const Hero = () => {
                             </button>
 
                             <button 
-                            onClick={() => navigate("/ai-consultant")}
+                            onClick={() => navigate("/skin-ai")}
                             className="border border-pink-400 text-pink-600 px-5 py-2 rounded-xl flex items-center gap-3 font-semibold hover:bg-white hover:text-black">
                                 <RiRobot2Line />
                                 Get AI Recommendations

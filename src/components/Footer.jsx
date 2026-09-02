@@ -5,7 +5,7 @@ const Footer = () => {
     <footer className="bg-[#0b132a] text-gray-300 pt-16 pb-8">
       {/* Container aligned with main sections */}
       <div className="max-w-7xl mx-auto px-10">
-        
+
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-12">
 
           <div className="md:col-span-5 pr-6">
@@ -33,21 +33,38 @@ const Footer = () => {
                 BeautyBloom
               </h2>
             </div>
-            
+
             <p className="text-sm text-gray-400 leading-relaxed max-w-md">
               Your trusted partner in beauty and wellness, bringing you the finest products for your natural glow. We believe everyone deserves to feel confident and beautiful in their own skin.
             </p>
 
             <div className="flex gap-3 mt-6">
-              <div className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-gray-300 hover:text-white hover:bg-pink-600 transition cursor-pointer">
+              <a
+                href="https://www.instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-gray-300 hover:text-white hover:bg-pink-600 transition"
+              >
                 <FiInstagram className="text-lg" />
-              </div>
-              <div className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-gray-300 hover:text-white hover:bg-pink-600 transition cursor-pointer">
+              </a>
+
+              <a
+                href="https://www.facebook.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-gray-300 hover:text-white hover:bg-pink-600 transition"
+              >
                 <FiFacebook className="text-lg" />
-              </div>
-              <div className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-gray-300 hover:text-white hover:bg-pink-600 transition cursor-pointer">
+              </a>
+
+              <a
+                href="https://twitter.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-gray-300 hover:text-white hover:bg-pink-600 transition"
+              >
                 <FiTwitter className="text-lg" />
-              </div>
+              </a>
             </div>
           </div>
 
@@ -71,7 +88,6 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Legal (Spans 2 Columns) */}
           <div className="md:col-span-2">
             <h4 className="font-semibold text-white mb-4 text-base">Legal</h4>
             <ul className="space-y-3 text-sm text-gray-400">
