@@ -16,12 +16,12 @@ const ShoppingHistory = () => {
         const result = await getMyOrdersAPI();
 
         if (result.success) {
-          (result.orders || []).sort(
+          const sortedOrders = (result.orders || []).sort(
             (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-          )
+          );
 
+          setOrders(sortedOrders);
           const reviewed = [];
-
           (result.orders || []).forEach((order) => {
             if (order.reviews) {
               order.reviews.forEach((review) => {
