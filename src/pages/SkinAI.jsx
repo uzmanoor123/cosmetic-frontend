@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { getAIRecommendationsAPI, chatWithAIAPI, addToCartAPI, } from "../lib/API";
+import { getAIRecommendationsAPI, chatWithAIAPI, addToCartAPI } from "../lib/API";
 import Navbar from "../components/Navbar";
-import { RiRobot2Line, RiSparkling2Line, RiArrowLeftLine, RiSendPlaneFill, } from "react-icons/ri";
+import { RiRobot2Line, RiSparkling2Line, RiArrowLeftLine, RiSendPlaneFill } from "react-icons/ri";
 import ReactMarkdown from "react-markdown";
 import { useNavigate } from "react-router-dom";
+
 const SkinAI = () => {
   const navigate = useNavigate();
   const [skinType, setSkinType] = useState("");
@@ -12,19 +13,15 @@ const SkinAI = () => {
   const [budget, setBudget] = useState("");
   const [preferences, setPreferences] = useState("");
   const [routine, setRoutine] = useState("");
-
   const [recommendations, setRecommendations] = useState([]);
   const [message, setMessage] = useState("");
   const [beautyTips, setBeautyTips] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
   const [activeTab, setActiveTab] = useState("recommendations");
-
   const [chatMessage, setChatMessage] = useState("");
   const [chatMessages, setChatMessages] = useState([]);
   const [chatLoading, setChatLoading] = useState(false);
-
 
   const skinTypes = [
     "Oily",
@@ -59,7 +56,6 @@ const SkinAI = () => {
     "$100+",
   ];
 
-
   const handleConcern = (concern) => {
     setConcerns((prev) =>
       prev.includes(concern)
@@ -68,10 +64,8 @@ const SkinAI = () => {
     );
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
 
     if (!skinType) {
       setError("Please select your skin type.");
@@ -152,6 +146,7 @@ Current skincare routine: ${routine || "None"}
     const userMessage = chatMessage.trim();
 
     setChatMessage("");
+
     setChatMessages((prev) => [
       ...prev,
       {
@@ -163,11 +158,17 @@ Current skincare routine: ${routine || "None"}
     setChatLoading(true);
 
     try {
-      console.log("Sending chatbot message:", userMessage);
+      console.log(
+        "Sending chatbot message:",
+        userMessage
+      );
 
       const data = await chatWithAIAPI(userMessage);
 
-      console.log("Chatbot response:", data);
+      console.log(
+        "Chatbot response:",
+        data
+      );
 
       if (data.success) {
         setChatMessages((prev) => [
@@ -206,46 +207,42 @@ Current skincare routine: ${routine || "None"}
       setChatLoading(false);
     }
   };
+
   const handleAddToCart = async (productId) => {
-  try {
-    const data = await addToCartAPI(productId);
+    try {
+      const data = await addToCartAPI(productId);
 
-    if (data.success) {
-      window.dispatchEvent(new Event("cartUpdated"));
+      if (data.success) {
+        window.dispatchEvent(
+          new Event("cartUpdated")
+        );
+      }
+    } catch (error) {
+      console.error(
+        "Add to cart error:",
+        error
+      );
     }
-  } catch (error) {
-    console.error("Add to cart error:", error);
-  }
-};
-
+  };
 
   return (
-
     <div className="min-h-screen bg-[#f8fafc]">
-
       <Navbar />
 
       <main className="px-5 pb-16 pt-8">
-
         <div className="mx-auto max-w-6xl">
-
 
           <button
             onClick={() => window.history.back()}
             className="mb-8 flex cursor-pointer items-center gap-2 text-sm font-medium text-pink-600 transition hover:text-pink-700"
           >
             <RiArrowLeftLine size={18} />
-
             Back to Store
           </button>
 
-
           <div className="mb-7 text-center">
-
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-pink-600 text-white">
-
               <RiRobot2Line size={27} />
-
             </div>
 
             <h1 className="text-3xl font-bold text-slate-900 sm:text-4xl">
@@ -257,175 +254,149 @@ Current skincare routine: ${routine || "None"}
               and our AI will recommend the perfect
               products for you
             </p>
-
           </div>
-
 
           <div className="mx-auto max-w-3xl overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
 
-
             <div className="grid grid-cols-2 border-b border-gray-200">
-
 
               <button
                 onClick={() =>
                   setActiveTab("recommendations")
                 }
-                className={`flex cursor-pointer items-center justify-center gap-2 border-b-2 py-4 text-sm font-medium transition ${activeTab === "recommendations"
-                  ? "border-pink-500 bg-pink-50 text-pink-600"
-                  : "border-transparent text-slate-600 hover:bg-gray-50"
-                  }`}
+                className={`flex cursor-pointer items-center justify-center gap-2 border-b-2 py-4 text-sm font-medium transition ${
+                  activeTab === "recommendations"
+                    ? "border-pink-500 bg-pink-50 text-pink-600"
+                    : "border-transparent text-slate-600 hover:bg-gray-50"
+                }`}
               >
                 <RiSparkling2Line size={18} />
-
                 Recommendations
               </button>
-
 
               <button
                 onClick={() =>
                   setActiveTab("chatbot")
                 }
-                className={`flex cursor-pointer items-center justify-center gap-2 border-b-2 py-4 text-sm font-medium transition ${activeTab === "chatbot"
-                  ? "border-pink-500 bg-pink-50 text-pink-600"
-                  : "border-transparent text-slate-600 hover:bg-gray-50"
-                  }`}
+                className={`flex cursor-pointer items-center justify-center gap-2 border-b-2 py-4 text-sm font-medium transition ${
+                  activeTab === "chatbot"
+                    ? "border-pink-500 bg-pink-50 text-pink-600"
+                    : "border-transparent text-slate-600 hover:bg-gray-50"
+                }`}
               >
                 <RiRobot2Line size={18} />
-
                 Chatbot
               </button>
 
             </div>
-            {activeTab === "recommendations" && (
 
+            {activeTab === "recommendations" && (
               <div className="p-6 sm:p-7">
 
                 <form onSubmit={handleSubmit}>
 
                   <div>
-
                     <label className="mb-2 block text-sm font-semibold text-slate-900">
                       What's your skin type?
                     </label>
 
                     <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-
                       {skinTypes.map((type) => (
-
                         <button
                           key={type}
                           type="button"
                           onClick={() =>
                             setSkinType(type)
                           }
-                          className={`rounded-lg border px-3 py-2.5 text-sm transition ${skinType === type
-                            ? "border-pink-500 bg-pink-50 font-semibold text-pink-600"
-                            : "border-gray-200 bg-white text-slate-700 hover:border-pink-300"
-                            }`}
+                          className={`rounded-lg border px-3 py-2.5 text-sm transition ${
+                            skinType === type
+                              ? "border-pink-500 bg-pink-50 font-semibold text-pink-600"
+                              : "border-gray-200 bg-white text-slate-700 hover:border-pink-300"
+                          }`}
                         >
                           {type}
                         </button>
-
                       ))}
-
                     </div>
-
                   </div>
 
                   <div className="mt-5">
-
                     <label className="mb-2 block text-sm font-semibold text-slate-900">
                       What are your main skin concerns?
                       (Select all that apply)
                     </label>
 
                     <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-
                       {skinConcerns.map((concern) => (
-
                         <button
                           key={concern}
                           type="button"
                           onClick={() =>
                             handleConcern(concern)
                           }
-                          className={`rounded-lg border px-3 py-2.5 text-sm transition ${concerns.includes(concern)
-                            ? "border-pink-500 bg-pink-50 font-semibold text-pink-600"
-                            : "border-gray-200 bg-white text-slate-700 hover:border-pink-300"
-                            }`}
+                          className={`rounded-lg border px-3 py-2.5 text-sm transition ${
+                            concerns.includes(concern)
+                              ? "border-pink-500 bg-pink-50 font-semibold text-pink-600"
+                              : "border-gray-200 bg-white text-slate-700 hover:border-pink-300"
+                          }`}
                         >
                           {concern}
                         </button>
-
                       ))}
-
                     </div>
-
                   </div>
 
                   <div className="mt-5">
-
                     <label className="mb-2 block text-sm font-semibold text-slate-900">
                       What's your age range?
                     </label>
 
                     <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-
                       {ageRanges.map((age) => (
-
                         <button
                           key={age}
                           type="button"
                           onClick={() =>
                             setAgeRange(age)
                           }
-                          className={`rounded-lg border px-3 py-2.5 text-sm transition ${ageRange === age
-                            ? "border-pink-500 bg-pink-50 font-semibold text-pink-600"
-                            : "border-gray-200 bg-white text-slate-700 hover:border-pink-300"
-                            }`}
+                          className={`rounded-lg border px-3 py-2.5 text-sm transition ${
+                            ageRange === age
+                              ? "border-pink-500 bg-pink-50 font-semibold text-pink-600"
+                              : "border-gray-200 bg-white text-slate-700 hover:border-pink-300"
+                          }`}
                         >
                           {age}
                         </button>
-
                       ))}
-
                     </div>
-
                   </div>
 
                   <div className="mt-5">
-
                     <label className="mb-2 block text-sm font-semibold text-slate-900">
                       What's your budget range?
                     </label>
 
                     <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-
                       {budgetRanges.map((range) => (
-
                         <button
                           key={range}
                           type="button"
                           onClick={() =>
                             setBudget(range)
                           }
-                          className={`rounded-lg border px-3 py-2.5 text-sm transition ${budget === range
-                            ? "border-pink-500 bg-pink-50 font-semibold text-pink-600"
-                            : "border-gray-200 bg-white text-slate-700 hover:border-pink-300"
-                            }`}
+                          className={`rounded-lg border px-3 py-2.5 text-sm transition ${
+                            budget === range
+                              ? "border-pink-500 bg-pink-50 font-semibold text-pink-600"
+                              : "border-gray-200 bg-white text-slate-700 hover:border-pink-300"
+                          }`}
                         >
                           {range}
                         </button>
-
                       ))}
-
                     </div>
-
                   </div>
 
                   <div className="mt-5">
-
                     <label className="mb-2 block text-sm font-semibold text-slate-900">
                       Any specific preferences?
                     </label>
@@ -439,11 +410,9 @@ Current skincare routine: ${routine || "None"}
                       placeholder="e.g. I prefer natural ingredients, I'm allergic to fragrance, I want cruelty-free products..."
                       className="w-full resize-none rounded-lg border border-gray-200 bg-white p-3 text-sm text-slate-700 outline-none placeholder:text-gray-400 focus:border-pink-400 focus:ring-1 focus:ring-pink-400"
                     />
-
                   </div>
 
                   <div className="mt-5">
-
                     <label className="mb-2 block text-sm font-semibold text-slate-900">
                       What's your current skincare routine?
                     </label>
@@ -457,15 +426,12 @@ Current skincare routine: ${routine || "None"}
                       placeholder="e.g. I wash my face twice daily, I use a moisturizer, I don't have a routine yet..."
                       className="w-full resize-none rounded-lg border border-gray-200 bg-white p-3 text-sm text-slate-700 outline-none placeholder:text-gray-400 focus:border-pink-400 focus:ring-1 focus:ring-pink-400"
                     />
-
                   </div>
 
                   {error && (
-
                     <p className="mt-3 text-sm text-red-500">
                       {error}
                     </p>
-
                   )}
 
                   <button
@@ -473,73 +439,55 @@ Current skincare routine: ${routine || "None"}
                     disabled={loading}
                     className="mt-4 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-pink-600 py-3.5 text-sm font-semibold text-white transition hover:bg-pink-700 disabled:cursor-not-allowed disabled:opacity-60"
                   >
-
                     <RiSparkling2Line size={17} />
 
                     {loading
                       ? "Finding Products..."
                       : "Get My Personalized Recommendations"}
-
                   </button>
 
                 </form>
 
-                {message && (
-
-                  <div className="mt-6 rounded-lg bg-pink-50 p-4">
-
-                    <p className="text-sm leading-relaxed text-slate-700">
-                      {message}
-                    </p>
-
-                  </div>
-
-                )}
-
               </div>
-
             )}
-            {beautyTips.length > 0 && (
-              <div className="mt-10 rounded-2xl border border-pink-100 bg-white p-6 shadow-sm">
 
-                <div className="flex items-center gap-3">
+            {activeTab === "recommendations" &&
+              beautyTips.length > 0 && (
+                <div className="mt-10 rounded-2xl border border-pink-100 bg-white p-6 shadow-sm">
 
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-pink-100 text-pink-600">
-                    <RiSparkling2Line size={20} />
-                  </div>
+                  <div className="flex items-center gap-3">
 
-                  <h3 className="text-xl font-bold text-slate-900">
-                    Personalized Beauty Tips
-                  </h3>
-
-                </div>
-
-                <div className="mt-5 space-y-3">
-
-                  {beautyTips.map((tip, index) => (
-                    <div
-                      key={index}
-                      className="flex items-start gap-3"
-                    >
-
-                      <span className="mt-1 text-pink-500">
-                        •
-                      </span>
-
-                      <p className="text-sm leading-relaxed text-slate-700">
-                        {tip}
-                      </p>
-
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-pink-100 text-pink-600">
+                      <RiSparkling2Line size={20} />
                     </div>
-                  ))}
+
+                    <h3 className="text-xl font-bold text-slate-900">
+                      Personalized Beauty Tips
+                    </h3>
+
+                  </div>
+
+                  <div className="mt-5 space-y-3">
+                    {beautyTips.map((tip, index) => (
+                      <div
+                        key={index}
+                        className="flex items-start gap-3"
+                      >
+                        <span className="mt-1 text-pink-500">
+                          •
+                        </span>
+
+                        <p className="text-sm leading-relaxed text-slate-700">
+                          {tip}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
 
                 </div>
-
-              </div>
-            )}
+              )}
 
             {activeTab === "chatbot" && (
-
               <div className="p-6 sm:p-7">
 
                 <div className="h-[340px] overflow-y-auto rounded-lg border border-gray-200 bg-gray-50 p-4">
@@ -573,17 +521,19 @@ Current skincare routine: ${routine || "None"}
 
                           <div
                             key={index}
-                            className={`flex ${chat.sender === "user"
-                              ? "justify-end"
-                              : "justify-start"
-                              }`}
+                            className={`flex ${
+                              chat.sender === "user"
+                                ? "justify-end"
+                                : "justify-start"
+                            }`}
                           >
 
                             <div
-                              className={`max-w-[80%] rounded-lg px-4 py-3 text-sm ${chat.sender === "user"
-                                ? "bg-pink-600 text-white"
-                                : "bg-white text-slate-700 shadow-sm"
-                                }`}
+                              className={`max-w-[80%] rounded-lg px-4 py-3 text-sm ${
+                                chat.sender === "user"
+                                  ? "bg-pink-600 text-white"
+                                  : "bg-white text-slate-700 shadow-sm"
+                              }`}
                             >
 
                               {chat.sender === "user" ? (
@@ -596,61 +546,51 @@ Current skincare routine: ${routine || "None"}
 
                                 <ReactMarkdown
                                   components={{
-
                                     h1: ({ children }) => (
                                       <h1 className="mb-3 text-lg font-bold text-slate-900">
                                         {children}
                                       </h1>
                                     ),
-
                                     h2: ({ children }) => (
                                       <h2 className="mb-2 mt-4 text-base font-bold text-slate-900">
                                         {children}
                                       </h2>
                                     ),
-
                                     h3: ({ children }) => (
                                       <h3 className="mb-2 mt-3 text-sm font-bold text-slate-900">
                                         {children}
                                       </h3>
                                     ),
-
                                     p: ({ children }) => (
                                       <p className="mb-3 leading-relaxed last:mb-0">
                                         {children}
                                       </p>
                                     ),
-
                                     strong: ({ children }) => (
                                       <strong className="font-bold text-slate-900">
                                         {children}
                                       </strong>
                                     ),
-
                                     ul: ({ children }) => (
                                       <ul className="mb-3 ml-5 list-disc space-y-1">
                                         {children}
                                       </ul>
                                     ),
-
                                     ol: ({ children }) => (
                                       <ol className="mb-3 ml-5 list-decimal space-y-1">
                                         {children}
                                       </ol>
                                     ),
-
                                     li: ({ children }) => (
                                       <li className="leading-relaxed">
                                         {children}
                                       </li>
                                     ),
-
                                     code: ({ children }) => (
                                       <code className="rounded bg-gray-100 px-1 py-0.5 text-xs">
                                         {children}
                                       </code>
                                     ),
-
                                     blockquote: ({ children }) => (
                                       <blockquote className="my-3 border-l-4 border-pink-400 pl-3 italic text-slate-600">
                                         {children}
@@ -670,23 +610,15 @@ Current skincare routine: ${routine || "None"}
                         )
                       )}
 
-
                       {chatLoading && (
-
                         <div className="flex justify-start">
-
                           <div className="rounded-lg bg-white px-4 py-3 text-sm text-slate-500 shadow-sm">
-
                             Thinking...
-
                           </div>
-
                         </div>
-
                       )}
 
                     </div>
-
                   )}
 
                 </div>
@@ -715,171 +647,182 @@ Current skincare routine: ${routine || "None"}
                     }
                     className="flex cursor-pointer items-center gap-2 rounded-lg bg-pink-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-pink-600 disabled:cursor-not-allowed disabled:opacity-50"
                   >
-
                     <RiSendPlaneFill size={16} />
 
                     {chatLoading
                       ? "Sending..."
                       : "Send"}
-
                   </button>
 
                 </form>
 
               </div>
-
             )}
 
           </div>
-          {activeTab === "recommendations" && recommendations.length > 0 && (
-            <section className="mt-12">
 
-              <div className="mb-8 text-center">
-                <p className="text-sm font-semibold uppercase tracking-wider text-pink-500">
-                  AI Powered
-                </p>
+          {activeTab === "recommendations" &&
+            recommendations.length > 0 && (
+              <section className="mt-12">
 
-                <h2 className="mt-1 text-2xl font-bold text-slate-900 sm:text-3xl">
-                  Recommended For You
-                </h2>
+                <div className="mb-8 text-center">
 
-                <p className="mx-auto mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">
-                  Based on your skin type, concerns, preferences, and budget,
-                  here are the products that best match your needs.
-                </p>
-              </div>
+                  <p className="text-sm font-semibold uppercase tracking-wider text-pink-500">
+                    AI Powered
+                  </p>
 
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  <h2 className="mt-1 text-2xl font-bold text-slate-900 sm:text-3xl">
+                    Recommended For You
+                  </h2>
 
-                {recommendations.map((product) => (
+                  <p className="mx-auto mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">
+                    Based on your skin type, concerns, preferences, and budget,
+                    here are the products that best match your needs.
+                  </p>
 
-                  <div
-                    key={product._id}
-                    className="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
-                  >
+                </div>
 
-                    <div className="relative overflow-hidden bg-gray-50">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
 
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="h-64 w-full object-cover transition duration-500 group-hover:scale-105"
-                      />
+                  {recommendations.map((product) => (
 
-                      <div className="absolute right-3 top-3 rounded-full bg-pink-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm">
-                        {product.matchScore}% Match
+                    <div
+                      key={product._id}
+                      className="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
+                    >
+
+                      <div className="relative overflow-hidden bg-gray-50">
+
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="h-64 w-full object-cover transition duration-500 group-hover:scale-105"
+                        />
+
+                        <div className="absolute right-3 top-3 rounded-full bg-pink-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm">
+                          {product.matchScore}% Match
+                        </div>
+
+                      </div>
+
+                      <div className="p-5">
+
+                        <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                          {product.brand}
+                        </p>
+
+                        <h3 className="mt-1 min-h-[48px] text-lg font-bold leading-snug text-slate-900">
+                          {product.name}
+                        </h3>
+
+                        <div className="mt-3 flex items-center justify-between">
+
+                          <span className="text-xl font-bold text-slate-900">
+                            ${product.price}
+                          </span>
+
+                          <span className="rounded-full bg-pink-50 px-3 py-1 text-xs font-semibold text-pink-600">
+                            AI Recommended
+                          </span>
+
+                        </div>
+
+                        <div className="mt-4 rounded-xl bg-pink-50 p-4">
+
+                          <div className="flex items-center gap-2">
+
+                            <RiSparkling2Line
+                              size={16}
+                              className="text-pink-600"
+                            />
+
+                            <p className="text-xs font-bold uppercase tracking-wide text-pink-700">
+                              Why we recommend it
+                            </p>
+
+                          </div>
+
+                          <p className="mt-2 text-sm leading-relaxed text-slate-700">
+                            {product.reason}
+                          </p>
+
+                        </div>
+
+                        <div className="mt-5 grid grid-cols-2 gap-2">
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              navigate(
+                                `/product/${product._id}`
+                              )
+                            }
+                            className="rounded-lg border border-pink-500 px-3 py-2.5 text-sm font-semibold text-pink-600 transition hover:bg-pink-50"
+                          >
+                            View Details
+                          </button>
+
+                          <button
+                            onClick={() =>
+                              handleAddToCart(
+                                product._id
+                              )
+                            }
+                            type="button"
+                            className="rounded-lg bg-pink-600 px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-pink-700"
+                          >
+                            Add to Cart
+                          </button>
+
+                        </div>
+
                       </div>
 
                     </div>
 
-                    <div className="p-5">
+                  ))}
 
-                      <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-                        {product.brand}
-                      </p>
+                </div>
 
-                      <h3 className="mt-1 min-h-[48px] text-lg font-bold leading-snug text-slate-900">
-                        {product.name}
-                      </h3>
+                {message && (
+                  <div className="mt-10 rounded-2xl border border-pink-100 bg-white p-6 shadow-sm">
 
-                      <div className="mt-3 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
 
-                        <span className="text-xl font-bold text-slate-900">
-                          ${product.price}
-                        </span>
-
-                        <span className="rounded-full bg-pink-50 px-3 py-1 text-xs font-semibold text-pink-600">
-                          AI Recommended
-                        </span>
-
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-pink-100 text-pink-600">
+                        <RiSparkling2Line size={20} />
                       </div>
 
-                      <div className="mt-4 rounded-xl bg-pink-50 p-4">
+                      <div>
 
-                        <div className="flex items-center gap-2">
-                          <RiSparkling2Line
-                            size={16}
-                            className="text-pink-600"
-                          />
+                        <h3 className="text-lg font-bold text-slate-900">
+                          Personalized Beauty Tips
+                        </h3>
 
-                          <p className="text-xs font-bold uppercase tracking-wide text-pink-700">
-                            Why we recommend it
-                          </p>
-                        </div>
-
-                        <p className="mt-2 text-sm leading-relaxed text-slate-700">
-                          {product.reason}
+                        <p className="mt-1 text-xs text-slate-500">
+                          Tips generated based on your beauty profile
                         </p>
 
                       </div>
 
-                      <div className="mt-5 grid grid-cols-2 gap-2">
-
-                        <button
-                          type="button"
-                          onClick={() =>
-                            navigate(`/product/${product._id}`)
-                          }
-                          className="rounded-lg border border-pink-500 px-3 py-2.5 text-sm font-semibold text-pink-600 transition hover:bg-pink-50"
-                        >
-                          View Details
-                        </button>
-
-                        <button
-                        onClick={() => handleAddToCart(product._id)}
-                          type="button"
-                          className="rounded-lg bg-pink-600 px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-pink-700"
-                        >
-                          Add to Cart
-                        </button>
-
-                      </div>
-
                     </div>
 
-                  </div>
+                    <div className="mt-4 rounded-xl bg-pink-50 p-4">
 
-                ))}
-
-              </div>
-
-              {message && (
-                <div className="mt-10 rounded-2xl border border-pink-100 bg-white p-6 shadow-sm">
-
-                  <div className="flex items-center gap-3">
-
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-pink-100 text-pink-600">
-                      <RiSparkling2Line size={20} />
-                    </div>
-
-                    <div>
-                      <h3 className="text-lg font-bold text-slate-900">
-                        Personalized Beauty Tips
-                      </h3>
-
-                      <p className="mt-1 text-xs text-slate-500">
-                        Tips generated based on your beauty profile
+                      <p className="text-sm leading-7 text-slate-700">
+                        {message}
                       </p>
+
                     </div>
 
                   </div>
+                )}
 
-                  <div className="mt-4 rounded-xl bg-pink-50 p-4">
-                    <p className="text-sm leading-7 text-slate-700">
-                      {message}
-                    </p>
-                  </div>
-
-                </div>
-              )}
-
-            </section>
-          )}
+              </section>
+            )}
 
         </div>
-
       </main>
-
     </div>
   );
 };
