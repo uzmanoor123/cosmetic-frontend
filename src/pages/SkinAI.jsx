@@ -731,7 +731,7 @@ Current skincare routine: ${routine || "None"}
             )}
 
           </div>
-          {recommendations.length > 0 && (
+          {activeTab === "recommendations" && recommendations.length > 0 && (
             <section className="mt-12">
 
               <div className="mb-8 text-center">
